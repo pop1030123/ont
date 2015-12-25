@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="../js/hw_plugin_public.js"></script>
+    <script type="text/javascript" src="../js/index.js"></script>	
+
+    <link rel="stylesheet" type="text/css" href="../css/index.css" />
+    <link rel="stylesheet" href="../css/common.css" />
+</head>
+
+<body onload="load();">    
+    <div id="ss_load_mask" class="ss_load_mask"></div>
+    <div id="ss_load_img" class="ss_load_img"><img src="../images/loading.gif">
+        <div><span id='ss_load_hint' local_key="Loading"></span></div>
+    </div>
+	<div class="div_deader">
+			<div class="div_header_left" onclick="goBack();">
+				<img class="div_header_left_img" src="../images/top_back.png" />
+			</div>
+			<div class="div_header_title" id="title"><span local_key="DeviceList">相框列表</span></div>
+			<div class="div_header_right"></div>
+	</div>
+
+    <div>
+        <ul class="devices">
+		</ul>
+    </div>
+</body>
+
+
+</html>

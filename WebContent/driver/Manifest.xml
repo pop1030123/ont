@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package version="1.0" resource="resource/resource.json">
+    <uid>20150915</uid>
+    <!-- The name of plugin -->
+    <name resource-key="TypeName">TypeName</name>
+    <descriptor resource-key="TypeName">TypeName</descriptor>
+    <manufacturer resource-key="manufacture">manufacture</manufacturer>
+    <version>1.0.5.10</version>
+
+    <!-- common: Network controll plugin; smart-home: Smart home plugin-->
+    <plugin-type>smart_home</plugin-type>
+    <app-type>HTML</app-type>
+
+    <install>preloaded</install>
+
+    <device-type>gallery</device-type>
+    <brand>songshu</brand>
+
+    <icon>icon.png</icon>
+    <icon-offline>icon_offline.png</icon-offline>
+
+    <device-status-entry>./index.html</device-status-entry>
+    <device-control-entry>./control.html</device-control-entry>	
+
+    <resources>
+        <resource language="default">resource/resource_zh.json</resource>
+        <resource language="zh">resource/resource_zh.json</resource>
+        <resource language="en">resource/resource.json</resource>
+    </resources>
+
+</package>

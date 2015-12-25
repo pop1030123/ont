@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package version="1.0" resource="resource/resource.json">
+    <uid>xiaosongshu</uid>
+    <!-- The symbolicname of ONT plugin -->
+    <symbolicname>com.songshu.smarthome.chinaunicom-sc.driver</symbolicname>
+    <!-- The name of plugin -->
+    <!-- The name of plugin -->
+    <name resource-key="Gallery">Songshu Gallery</name>
+    <version>1.0.3.6</version>
+    <!-- common: Network controll plugin; smart-home: Smart home plugin-->
+    <plugin-type>common</plugin-type>
+    <plugin-catalog>myStorage</plugin-catalog>
+
+    <uses-feature></uses-feature>
+    <install>preloaded</install>
+    <!-- APP type：html, url, native, war, device -->
+    <app-type>html</app-type>
+    <!-- native type：android, ios. Only valid if app-type is native -->
+    <device-type>gallery</device-type>
+    <brand>songshu</brand>
+    <requisite>login</requisite>
+    <supports-screens>480*800/320*480</supports-screens>
+    <!-- The entry icon displays in mobile APP -->
+    <icon>icon.png</icon>
+    <entry>html/index.html</entry>
+    
+    <widget-list>
+	 	 <widget 
+	        name = "Songshu Dcim" 
+	        entry="html/card_index.html">
+		</widget>
+	</widget-list>
+    
+    <author>songshu</author>
+	
+	<resources>
+		<resource language="default">resource/resource.json</resource>
+		<resource language="en">resource/resource_en.json</resource>
+		<resource language="zh">resource/resource_zh.json</resource>
+		<resource language="ru">resource/resource_ru.json</resource>
+	</resources>
+</package>

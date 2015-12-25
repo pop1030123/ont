@@ -1,0 +1,62 @@
+@CHARSET "UTF-8";
+*{
+	margin:0px;
+	padding:0px;
+}
+/**
+body,table,iframe,td,p,div,a,form,ol,ul,li,select,input,dl,dd,dt,h1,h2,h3,h4,h5,h6,select,textarea
+	{	
+	margin: 0px;
+	padding: 0px;
+	list-style: none;
+	outline: none;
+	font-size: 0.8em;
+	color:rgba(255, 255, 255, 0.6);
+}
+*/
+
+html,body {
+	height: 100%;
+	-webkit-user-select:none;/*webkitä¯ÀÀÆ÷*/
+	user-select:none;
+}
+
+body div {
+    -webkit-transform: translate3d(0,0,0);
+}
+
+
+.content_div{
+	position:relative;
+	height:5em;
+}
+.device_name {
+	position:absolute;
+	bottom:1.4em;
+	left:0px;
+	font-size: 0.7em;
+	vertical-align:middle;
+	color:rgba(120,120,120,0.4);
+	text-align:center;
+	height:auto;
+}
+
+.device_action{
+	position:absolute;
+	top:0px;
+	right:0px;
+	color:#f00;
+	text-align:center;
+	height:5em;
+	line-height:5em;
+}
+.device_action_rlt{
+	right:auto;
+	left:0px;
+}
+
+.device_name_rlt{
+	right:0px;
+	left:auto;
+}
+.device_action img{width:2em;height:auto;vertical-align:middle;}

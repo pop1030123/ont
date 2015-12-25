@@ -1,0 +1,160 @@
+@CHARSET "UTF-8";
+
+/**默认全局样式 **/
+*{
+	margin: 0px;
+	padding:0px;	
+}
+html{
+	 height:100%;
+}
+/* 设置背景颜色*/
+body
+{
+	width:100%;
+	background-size:100% 100%;
+	background-color: #F5F5F5; 
+}
+
+/**正文部分  start **/
+
+.div_deader{
+         position:relative;
+         height: 3.0em;
+         width: 100%;
+         background-color: #fff;
+         border-bottom:1px solid #c8c7cc;
+}
+.div_header_left{
+         position:relative;
+        float: left;
+         width: 25%;
+         height: 100%;
+}
+
+.div_header_left_img{
+    position:relative;
+    float: left;
+    height: 70%;
+	margin-top: 0.3em;	 
+}
+
+.div_header_title{
+    position:relative;
+    float: left;
+    width: 50%;
+    height: 2.5em;
+    margin-top: 0.6em;
+    text-align: center;
+    font-size: 1.1em;
+    color: #333333;
+}
+.div_header_right{
+         position:relative;
+         width: 25%;
+         float: left;
+}
+
+.devices{
+	margin-top:0.5em;
+}
+
+
+#ss_bar{
+  width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  background-color:#ff861b;
+  color: #fff;
+  min-height: 50px;
+  vertical-align: middle;
+  line-height: 50px;
+  padding-left: 10px;
+  padding-right: 10px;
+  display: table;
+}
+#ss_back{
+    vertical-align: middle;
+    display: -webkit-inline-box;
+    height: 26px;
+    text-align: center;
+    line-height: 26px;
+}
+#ss_title{
+    width: inherit;
+    margin-right: auto;
+    margin-left: auto;
+    color: #fff;
+    min-height: 26px;
+    vertical-align: middle;
+    line-height: 26px;
+    text-align: center;
+    float: none;
+    display: table-cell;
+    font-size: 18px;
+}
+
+
+#ss_divider{
+  height: 10px;
+  background-color: #f4f4f4;
+}
+div.element {
+  margin-top: 1.5em;
+  margin-left: 1.5em;
+  margin-bottom: 2em;
+  
+}
+img.logo {
+  margin-right: 1em;
+  float: left;
+  width: 3em;
+  height: 3em;
+  /*border-radius: 1.5em;*/
+}
+span {
+  line-height: 1em;
+}
+span.nickname {
+  float: right;
+  margin-right: 3em;
+}
+.name{
+  color: #333;
+  font-size: 16px;
+}
+.sqr_no{
+  color: #999;
+  font-size: 12px;
+  margin-left:0.4em;
+}
+.sqr_no_pre{
+  color: #999;
+  font-size: 12px;
+}
+li:hover {
+  background-color: #eee;
+}
+
+.ss_load_mask {
+display: none;
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-color: #f5f5f5;
+opacity:0.5;
+z-index: 1000;
+}
+
+.ss_load_img {
+display: none;
+position: absolute;
+top: 40%;
+left: 40%;
+width: 20%;
+height: 20%;
+z-index: 1001;
+text-align:center;
+}

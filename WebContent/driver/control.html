@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" href="main.css" />
+<script type="text/javascript" src="javascript/hw_plugin_public.js"></script>
+<script type="text/javascript">
+var resource = null;
+var isContact = false;
+
+function getResource(){
+	if(resource == null){
+		//取对应的语言文件
+		resource = window.AppJsBridge.getDefaultResource();
+	}
+	return resource;
+}
+
+function initPage(){
+	var spanArray = document.getElementsByTagName("span");
+	for(var i = 0; i < spanArray.length; i++){
+		var key = spanArray[i].getAttribute("local_key");
+		spanArray[i].innerHTML = getResource()[key];
+	}
+}
+
+function load(){
+	window.AppJsBridge.getResource({
+		"success":function(data){
+						resource = data;
+						initPage();
+					},
+		"error":function(data){}
+	})
+}
+</script>
+</head>
+<body width = "100%" onload="load();">
+    <span local_key="Explain">此页面仅提供对设备进行操作，如需上传照片到相框请点击松鼠相框应用界面!</span>
+</body>
+
+</html>

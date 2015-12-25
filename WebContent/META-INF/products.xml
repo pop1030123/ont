@@ -1,0 +1,35 @@
+<products brand="SongShuGallery" manufacturer="SongShu"
+	resource="resource/resource.properties" brand-resource="SongShuGallery_BRAND"
+	manufacturer-resource="SongShu_manufacturer">
+	<driver-config discover-mode="CUSTOM"
+		discover-class="com.songshu.smarthome.driver.GalleryDeviceDiscoverer"
+		implement-class="com.songshu.smarthome.driver.GalleryDeviceDriver">
+	</driver-config>
+
+	<product name="SongShuGallery" description="Song Shu Gallery"
+		title="SongshuGallery.product.name">
+		<properties>
+			<property name="IP"/>
+		</properties>
+		<actions>
+			<!-- 通知ont上传文件 -->
+			<action name="upload" description="Upload file to gallery"
+				title="">
+				<parameter name="fileName" type="string" description=""></parameter>
+			</action>
+			<!-- 获取上传进度 -->
+			<action name="getUploadProgress">
+				<parameter name="fileName" type="string" description=""></parameter>
+			</action>
+		</actions>
+		<view>
+			<icon>SongshuGallery/image/icon.png</icon>
+			<icon-offline>SongshuGallery/image/icon_offline.png</icon-offline>
+			<device-status-entry>SongshuGallery/status.html</device-status-entry>
+			<device-control-entry>SongshuGallery/control.html
+			</device-control-entry>
+			<device-guide-entry>SongshuGallery/install-guide.html
+			</device-guide-entry>
+		</view>
+	</product>
+</products>

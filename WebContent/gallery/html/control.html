@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Huawei</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale = 1.0,user-scalable=no" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="HandheldFriendly" content="true"/>
+  <meta name="Keywords" content="" />
+  <meta name="Description" content="" />
+  <link rel="stylesheet" href="../css/reset.css" />
+  <link rel="stylesheet" href="../css/control.css" />
+  <link rel="stylesheet" href="../css/common.css" />
+  <script type="text/javascript" src="../js/hw_plugin_public.js"></script>
+  <script type="text/javascript" src="../js/control.js"></script>
+  <script type="text/javascript" src="../js/jquery.js"></script>
+  <script type="text/javascript" src="../js/jquery.lazyload.js"></script>
+</head>
+<body onload="load();">
+    <div id="ss_load_mask" class="ss_load_mask"></div>
+    <div id="ss_load_img" class="ss_load_img">
+        <div id="ss_bar">
+          <div id="ss_left" onclick="goBack();">
+             <img id="ss_back" src="../images/top_back.png" />
+          </div>
+          <div id='ss_title'></div>
+          <div id="finish" onclick="finish();"></div>
+        </div>
+        <ul id="file_list"></ul>
+        <div id="log"></div>
+    </div>
+  <div class="cont">
+    <div class="contImg"></div>
+    <div class="cont1">
+      <div class="cont1-1">
+        <ul class="cont1-1Ul">
+          <li>
+            <button class="btn1" id="btn1"></button>
+            <p id="ss_upload_txt"></p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

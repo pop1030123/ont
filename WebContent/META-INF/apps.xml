@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<apps resource="resource/resource.properties">
+		
+	<!-- 普通应用入口 title：应用国际化字符串 -->
+	<app name="SongshuGallery" title="SongshuGallery.product.name">
+		<icon>gallery/icon.png</icon>
+		<entry>gallery/html/index.html</entry>
+	</app>
+
+	<!-- 卡片入口 -->
+	<widget-list>
+		<widget name="SongshuGallery" title="SongshuGallery.product.name" entry="gallery/html/card_index.html">
+		</widget>
+	</widget-list>
+</apps>

@@ -1,0 +1,192 @@
+
+/**默认全局样式 **/
+*{
+	margin: 0px;
+	padding:0px;	
+}
+.html{
+    font-size:20px;-webkit-transform:traslateZ(0);
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    outline: 0;
+    -webkit-text-size-adjust:none;
+}
+body 
+{ 
+	 width: 100%;
+	 height: 100%;
+	 background-size:100% 100%;
+     margin: 0;
+     overflow: hidden;
+     -webkit-user-select: none;
+	background: #f0f0f0 
+} 
+.cont{
+	width:100%;
+	background: #f0f0f0;
+	overflow: hidden;
+	text-align: center;
+}
+.contImg{
+	width:32rem;
+	height:21rem;
+	background: url(../images/indexImg.png) no-repeat;
+	-webkit-background-size:32rem 21rem;
+
+}
+.cont1{
+	width:100%;
+	height:auto;
+}
+.cont1-1{
+	width:17.7rem;
+	height: 22.1rem;
+	margin:6.4rem auto 0;
+	overflow: hidden;
+}
+.cont1-1Ul li{
+	width:6rem;
+	height: 10.8rem;
+	float: left;
+	color:#807c7a;
+	text-align: center;
+}
+.cont1-1Ul p{
+	margin-top: 0.9rem;
+	font-size: 1.4rem;
+	font-family: "冬青黑体简体中文";
+}
+.cont1-1Ul .floatR{
+	float:right;
+}
+
+.btn1{
+	width:6rem;
+	height: 6rem;
+	background: url(../images/btn02.png) no-repeat;
+	-webkit-background-size:6rem 6rem;
+	border:none;
+	cursor: pointer;
+}
+
+.element {
+  vertical-align: middle;
+  height: 50px;
+  background-color: transparent;
+}
+.progress{
+  color: #333;
+  font-size: 14px;
+  background-color: transparent;
+  width: 200px;
+  display: inline-flex;
+}
+
+.thumb{
+	vertical-align: middle;
+	margin-right: 5px;
+}
+
+.retryDiv{
+  float: right;
+  line-height: 50px;
+  height: 50px;
+  text-align: center;
+  vertical-align: middle;
+  background-color: transparent ;
+}
+
+.retryBtn{
+    width: 60px;
+    height: 35px;
+	font-size: 14px;
+	margin-top: 8px;
+    background: url(../images/retry_default.png) no-repeat;
+    background-size: contain;
+    border: none;
+    background-color: transparent;
+}
+.btn2{
+	width:6rem;
+	height: 6rem;
+	background: url(../images/btn03.png) no-repeat;
+	-webkit-background-size:6rem 6rem;
+	border:none;
+	cursor: pointer;
+}
+.btn3{
+	width:6rem;
+	height: 6rem;
+	background: url(../images/btn04.png) no-repeat;
+	-webkit-background-size:6rem 6rem;
+	border:none;
+	cursor: pointer;
+}
+.btn4{
+	width:6rem;
+	height: 6rem;
+	background: url(../images/btn01.png) no-repeat;
+	-webkit-background-size:6rem 6rem;
+	border:none;
+	cursor: pointer;
+}
+
+#ss_bar{
+  position:relative;
+  height: 4.0em;
+  width: 100%;
+  background-color: #fff;
+  border-bottom:1px solid #c8c7cc;
+  vertical-align: middle;
+  line-height: 4.0em;
+  padding-left: 0px;
+  padding-right: 0px;
+  display: flex;
+}
+
+#ss_left{
+   width: 15%;
+   display: table-cell;
+   height: 100%;
+   text-align: center;
+}
+
+#ss_back{
+  vertical-align: middle;
+  height: 70%;
+}
+#ss_title{
+    width: 70%;
+    text-align: center;
+    font-size: 18px;
+    color: #333333;
+}
+#finish{
+   width: 15% ;
+   text-align: center;
+   font-size: 16px;
+   color: #333333;
+}
+
+.ss_load_mask {
+display: none;
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-color: #f5f5f5;
+opacity:0.8;
+z-index: 1000;
+}
+
+.ss_load_img {
+display: none;
+position: absolute;
+top: 0%;
+left: 0%;
+width: 100%;
+height: 100%;
+z-index: 1001;
+}

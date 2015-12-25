@@ -1,0 +1,92 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" href="main.css" />
+<script type="text/javascript" src="javascript/hw_plugin_public.js"></script>
+<script type="text/javascript">
+var resource = null;
+var isContact = false;
+
+function getResource(){
+	if(resource == null){
+		//取对应的语言文件
+		resource = window.AppJsBridge.getDefaultResource();
+	}
+	return resource;
+}
+
+function initPage(){
+	var spanArray = document.getElementsByTagName("span");
+	for(var i = 0; i < spanArray.length; i++){
+		var key = spanArray[i].getAttribute("local_key");
+		spanArray[i].innerHTML = getResource()[key];
+	}
+
+     if(window.AppJsBridge.getCurrentLanguage() == "ar"){
+        document.getElementById("main").className += " device_name_rlt";
+        document.getElementById("action_div").className += " device_action_rlt";
+    }
+}
+
+function load(){
+	window.AppJsBridge.getResource({
+		"success":function(data){
+						//alert('data--'+JSON.stringify(data));
+						resource = data;
+						initPage();
+						queryState();
+					},
+		"error":function(data){}
+	})
+}
+
+function queryState(){		
+	document.getElementById("main").innerHTML = getResource().Waiting;
+	window.AppJsBridge.getSmartDevice({"success":successCallback,"error":failCallback});
+}
+
+function failCallback(data){
+	//alert("MotionDetector "+data);
+	document.getElementById("main").innerHTML = getResource().Offline;
+}
+
+function successCallback(data){
+	var jsonStr = data;
+	if (jsonStr == null || jsonStr == "")
+	{
+		document.getElementById("main").innerHTML = getResource().Offline;
+		return;
+	}
+
+    window.eval("var obj = " + jsonStr);    
+    
+    if (obj == null || obj.status== null || obj.status == "Offline")
+    {
+    	document.getElementById("main").innerHTML =	getResource().Offline;
+    }
+    else
+    {
+		var status = getResource().Online;
+		document.getElementById("main").innerHTML = status;
+		try{
+			//在线 让设备图片亮起来。
+			window.parent.refreshLi(decodeURIComponent(getUrlParams(location.href).sn));
+		}catch(err){
+			
+		}
+    	
+    }
+}
+
+</script>
+</head>
+<body width = "100%" onload="load();">
+	<div class= "content_div">
+		<div id = "main" class = "device_name " >
+			<span local_key="Online"></span>
+		</div>
+		<div class = "device_action " id = "action_div"><!--<img src="images/click.png"/>--></div>
+	</div>
+	
+</html>
