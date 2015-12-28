@@ -18,44 +18,33 @@ import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
 
 import com.huawei.smartgateway.deviceservice.interfaces.lanservice.ILANService;
+import com.huawei.smarthome.driver.IDeviceService;
+import com.huawei.smarthome.log.LogService;
 import com.huawei.smarthome.proxy.device.Device;
-import com.huawei.smarthome.proxy.log.LogService;
 import com.huawei.smarthome.proxy.util.OsgiUtil;
 import com.songshu.smarthome.api.API;
 import com.songshu.smarthome.device.SongshuDevice;
 
 public class PutDeviceTask extends TimerTask {
 	
-	private SQRDeviceManageService repository;
+	private IDeviceService repository;
 	private LogService logger;
 	private JSONObject input;
-	private BundleContext context;
+	private String ip;
 	
-	public PutDeviceTask(BundleContext context, SQRDeviceManageService repository, LogService logger, JSONObject input) {
-		this.context = context;
+	public PutDeviceTask(IDeviceService repository, LogService logger, JSONObject input, String ip) {
 		this.repository = repository;
 		this.logger = logger;
 		this.input = input;
+		this.ip = ip;
 	}
 	
 	@Override
 	public void run() {
-		List<Device> currentList = repository.getAllDevice();
-		logger.i("当前设备数量:" + currentList.size());
+//		List<Device> currentList = repository.getAllDevice();
+//		logger.i("当前设备数量:" + currentList.size());
 
-		String mac = input.getString("MacAddr");
-		ILANService service = OsgiUtil.getService(context, ILANService.class, null);
-		String info = service.lanGetNetInfo();
-		logger.i("LAN网络信息:" + info);
-		JSONArray list = new JSONObject(info).getJSONArray("Info");
-		String ip = "";
-		for (int i = 0; i < list.length(); i++) {
-			JSONObject item = list.getJSONObject(i);
-			if (item.getString("MAC").equals(mac)) {
-				ip = item.getString("IP");
-				break;
-			}
-		}
+//		String ip = getLocalIpAddress().toString();
 		
 		logger.i("设备IP:" + ip);
 		JSONObject data = getDeviceInfo(ip, API.HUAWEI_NETWORK_INTERFACE_NAME);
@@ -80,7 +69,7 @@ public class PutDeviceTask extends TimerTask {
 			device.setBrand("songshu");
 			device.setIp(ip);
 			logger.i("松鼠插件注册设备:" + device.getSn());
-			repository.addDevice(device);
+			repository.reportIncludeDevice(input.optString("MAC"), "SongShuGallery", new JSONObject());
 		}
 	}
 	

@@ -66,7 +66,7 @@ public class DeviceStatusManager {
 				JSONObject item = list.getJSONObject(i);
 				JSONObject input = new JSONObject();
 				input.put("MacAddr", item.getString("MAC"));
-				new Timer().schedule(new PutDeviceTask(context, repository, logger, input), 3000);
+//				new Timer().schedule(new PutDeviceTask(context, repository, logger, input), 3000);
 				try {
 					Thread.sleep(3000);
 				} catch (InterruptedException e) {

@@ -1,11 +1,14 @@
 package com.songshu.smarthome.driver;
 
+import java.util.Timer;
+
 import org.json.JSONObject;
 
 import com.huawei.smarthome.driver.IDeviceService;
 import com.huawei.smarthome.driver.ip.AbstractIPDiscoverer;
 import com.huawei.smarthome.log.LogService;
 import com.huawei.smarthome.log.LogServiceFactory;
+import com.songshu.smarthome.PutDeviceTask;
 
 /**
  * <div class="English"> </div><br>
@@ -54,7 +57,7 @@ public class GalleryDeviceDiscoverer extends AbstractIPDiscoverer
         //没有入网，则判断设备是否是驱动管理的设备
         if (null == device)
         {
-            deviceService.reportIncludeDevice(deviceIpInfo.optString("MAC"), "SongShuGallery", new JSONObject());
+        	new Timer().schedule(new PutDeviceTask(deviceService, log, deviceIpInfo, getLocalIpAddress().toString()), 3000);
         }
     }
 }
