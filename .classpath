@@ -13,5 +13,9 @@
 	<classpathentry kind="lib" path="libs/okhttp-2.5.0.jar"/>
 	<classpathentry kind="lib" path="libs/okio-1.6.0.jar"/>
 	<classpathentry kind="lib" path="libs/gson-2.2.4.jar"/>
+	<classpathentry kind="lib" path="libs/com.google.gson-2.2.4.jar"/>
+	<classpathentry kind="lib" path="libs/com.huawei.smartgateway.deviceservice_1.0.0.jar"/>
+	<classpathentry kind="lib" path="libs/com.huawei.smarthome.proxy_1.7.1.3.jar"/>
+	<classpathentry kind="lib" path="libs/com.huawei.smarthome.storage.wocloud_1.0.4.2.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
