@@ -190,7 +190,11 @@ function upload(fileObj){
                     }
                 }
                 log(fileIndex+':callDevice:MOMENTS:'+curFileKey);
+                //AppJsBridge.service.deviceService.doAction()
                 AppJsBridge.callDevice({
+                	"sn":sn,
+                	"deviceClass":"?deviceClass",
+                	"action":"?action",
                     "parameter": JSON.stringify(request),
                     "success":function(res_suc_cd) {
                       var resObj = JSON.parse(res_suc_cd);
