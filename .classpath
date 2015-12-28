@@ -9,5 +9,9 @@
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="lib" path="libs/com.huawei.smarthome.sdk_0.9.0.jar"/>
+	<classpathentry kind="lib" path="libs/commons-io-2.4.jar"/>
+	<classpathentry kind="lib" path="libs/okhttp-2.5.0.jar"/>
+	<classpathentry kind="lib" path="libs/okio-1.6.0.jar"/>
+	<classpathentry kind="lib" path="libs/gson-2.2.4.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
