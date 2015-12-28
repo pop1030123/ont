@@ -41,7 +41,7 @@ public class UploadSttatusManager {
 		statusCode.put(STATUS_CODE_NONE, "查询的状态不存在");
 		statusCode.put(STATUS_CODE_NETWORK, "当前网络环境缓慢，请重试");
 
-		Timer timer = new Timer();
+		final Timer timer = new Timer();
 		timer.schedule(new TimerTask() {
 
 			@Override

@@ -193,8 +193,8 @@ public class API {
 		}
 	}
 
-	public void uploadFile(String sn, String songshuToken, String token, InputStream stream, long fileSize,
-			String filePath) {
+	public void uploadFile(final String sn, final String songshuToken, final String token, final InputStream stream, final long fileSize,
+			final String filePath) {
 		logger.i("****------------->uploadFile sn:" + sn + "	filePath:" + filePath);
 		new Thread() {
 			@Override

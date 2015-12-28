@@ -3,8 +3,6 @@ package com.songshu.smarthome;
 import java.io.InputStream;
 import java.util.Timer;
 
-import javax.swing.LookAndFeel;
-
 import org.json.JSONObject;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -20,7 +18,6 @@ import com.huawei.smarthome.proxy.message.MessageDispatcher;
 import com.huawei.smarthome.proxy.message.MessageProcessor;
 import com.huawei.smarthome.proxy.service.DeviceManageService;
 import com.huawei.smarthome.proxy.service.MessageHandleService;
-import com.qiniu.storage.InputStreamUploader;
 import com.songshu.smarthome.api.API;
 
 /**
@@ -43,7 +40,7 @@ public class Activator implements BundleActivator {
 	 * @param context
 	 *            OSGI上下文
 	 */
-	public void start(BundleContext context) {
+	public void start(final BundleContext context) {
 		// repository = new SQRDeviceRepository(context);
 		// repository.start();
 
