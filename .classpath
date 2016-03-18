@@ -8,7 +8,6 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="lib" path="libs/com.huawei.smarthome.sdk_0.9.0.jar"/>
 	<classpathentry kind="lib" path="libs/commons-io-2.4.jar"/>
 	<classpathentry kind="lib" path="libs/okhttp-2.5.0.jar"/>
 	<classpathentry kind="lib" path="libs/okio-1.6.0.jar"/>
@@ -25,5 +24,6 @@
 	<classpathentry kind="lib" path="libs/org.apache.felix.gogo.shell-0.10.0.jar"/>
 	<classpathentry kind="lib" path="libs/org.eclipse.osgi_3.9.1.v20140110-1610.jar"/>
 	<classpathentry kind="lib" path="libs/org.eclipse.osgi.services_3.3.100.v20130513-1956.jar"/>
+	<classpathentry kind="lib" path="libs/com.huawei.smarthome.sdk_1.0.0.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

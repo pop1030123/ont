@@ -190,11 +190,10 @@ function upload(fileObj){
                     }
                 }
                 log(fileIndex+':callDevice:MOMENTS:'+curFileKey);
-                //AppJsBridge.service.deviceService.doAction()
-                AppJsBridge.callDevice({
-                	"sn":sn,
-                	"deviceClass":"?deviceClass",
-                	"action":"?action",
+                AppJsBridge.service.applicationService.doAction({
+                	  "sn":sn,
+                	  "deviceClass":"uploadClass",
+                	  "action":"upload",
                     "parameter": JSON.stringify(request),
                     "success":function(res_suc_cd) {
                       var resObj = JSON.parse(res_suc_cd);
@@ -307,7 +306,10 @@ function checkProgress(key){
                     }
                 }
     log(fileIndex+':checkProgress:'+key+':m_key:'+m_progress_key);
-    AppJsBridge.callDevice({
+    AppJsBridge.service.applicationService.doAction({
+                    "sn":sn,
+                    "deviceClass":"progressClass",
+                    "action":"getUploadProgress",
                     "parameter": JSON.stringify(request),
                     "success":function(res_chk_pro) {
                       var resObj = JSON.parse(res_chk_pro);
@@ -349,8 +351,9 @@ function initScale(){
     document.querySelector('html').style.fontSize = 10*(s_width/320) + 'px';
 }
 function goBack(){
-    window.AppJsBridge.goBack({
-        "success":function(data){},
-    "error":function(data){}
-    });
+    window.AppJsBridge.service.applicationService.closePage();
+    // window.AppJsBridge.goBack({
+    //     "success":function(data){},
+    // "error":function(data){}
+    // });
 }

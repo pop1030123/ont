@@ -32,7 +32,8 @@ function load(){
 
 function getGalleryList()
 {
-    window.AppJsBridge.getAddedDeviceList({
+    // window.AppJsBridge.getAddedDeviceList({
+    window.AppJsBridge.service.deviceService.getDeviceList({
         success: function(res) {
             var data = JSON.parse(res);
             var devices = $('ul.devices');
