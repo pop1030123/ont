@@ -1,6 +1,7 @@
 var __initFlag = false;
 var _successCallback = null;
 var _processCallback = null;
+var _messageCallback = null;
 var _failCallback = null;
 var _currentBridge = null;
 var isAndroid = false;
@@ -17,12 +18,12 @@ var OnMessage = function(e) {
 }
 
 var callBackObj = {
-		success:{},
-		error:{}
+	success:{},
+	error:{}
 };
 
 var reqNum = 0;
-var maxReqNumOnce = 10;
+var maxReqNumOnce = 26;
 
 //设定同一时间内最大的请求数量，防止回调被覆盖。
 function getMagicNum(){
@@ -51,118 +52,44 @@ var regesterCallback = function(data){
 
 //捕获所有的成功回调，统一做处理。
 var _onSuccess = function(fun,data){
+	console.log("onSuccess--"+data);
 	var res = data;
-	/*
 	if(typeof(data) != "object"){
 		try{
-			res = JSON.parse(data);
+			data = data.replace(/\\/g, "\\\\");
+			res =  eval("("+data+")");
 		}catch(e){
 			res = data;
 		}
 	}
-	*/
 	fun(res);
 }
 
 //捕获所有的异常回调，统一作处理。
 var _onFail = function(fun,data){
 	var res = data;
-	/*
 	if(typeof(data) != "object"){
 		try{
-			res = JSON.parse(data);
+			res = eval("("+data+")");
 		}catch(e){
 			res = data;
 		}
 	}
-	*/
 	fun(res);
 }
 
 
-
 window.AppJsBridge = {
-
-	callDevice : function(data) {
-		try {
-			var parameter = data.parameter;
-			_successCallback = data.success;
-			_failCallback = data.error;
-			_init();
-			// 调用请求
-			_callDevice(parameter, _successCallback, _failCallback);
-		} catch (e) {
-			// 参数异常。
+	ready:function(fun){
+		document.addEventListener("load",fun);
+	},
+	enableDebugMode:function(fun){
+		try{
+			fun();
+		}catch(e){
+			alert(e+"\n\r"+e.stack);
 		}
 	},
-
-	getSmartDevice : function(data) {
-		_successCallback = data.success;
-		_failCallback = data.error;
-		_init();
-		_getSmartDevice(_successCallback, _failCallback);
-	},
-	
-	getAddedDeviceList : function(data) {
-	
-		var callback = regesterCallback(data);
-        _init();
-        _getAddedDeviceList(callback.success,callback.error);
-	},
-	
-	swithDevice : function(data) {
-		var parameter = data.parameter;
-		_successCallback = data.success;
-		_failCallback = data.error;
-		_init();
-		swith(parameter, _successCallback, _failCallback);
-	},
-
-	sendMsgToOnt : function(data) {
-		var parameter = data.parameter;
-		_successCallback = data.success;
-		_failCallback = data.error;
-		_init();
-		_sendMsgToOnt(parameter, _successCallback);
-	},
-
-	goBack : function(data) {
-		_init();
-		_successCallback = data.success;
-		_failCallback = data.error;
-		back(_successCallback, _failCallback);
-	},
-
-	getResource : function(data) {
-		_successCallback = data.success;
-		_failCallback = data.error;
-		_init();
-		findResource(_successCallback, _failCallback);
-	},
-	
-	getCurrentUserInfo : function(data) {
-		_successCallback = data.success;
-		_failCallback = data.error;
-		_init();
-		_getCurrentUserInfo(_successCallback, _failCallback);
-	},
-
-	getDefaultResource : function() {
-		return _initWithLanguage(language);
-	},
-
-	getCurrentLanguage : function() {
-		return _language;
-	},
-
-	setItem : function(key, value) {
-		window.AppJSBridge.setItem(key, value);
-	},
-
-	getItem : function(key) {
-		return window.AppJSBridge.getItem(key);
-	},
-	
 	service : {
 		openActivity : function(data) {
 			_successCallback = data.success;
@@ -188,95 +115,20 @@ window.AppJsBridge = {
 
 }
 
-window.AppJsBridge.service.storageService = {
-	getFamilyId : function(data) {
-		_successCallback = data.success;
-		_failCallback = data.error;
+window.AppJsBridge.service.localeService = {
+	getResource:function(data){
+		var callback = regesterCallback(data)
 		_init();
-		_getFamilyId(_successCallback);
-	},
-
-	listObjects : function(data) {
-		var type = data.type;
-		var url = data.url;
-		_successCallback = data.success;
-		_init();
-		_listObjects(type, url, _successCallback);
-	},
-
-	chooseFiles : function(data) {
-		var type = data.type;
-		var source = data.source;
-		var maxFile = data.maxFile;
-		_successCallback = data.success;
-		_init();
-		_chooseFiles(maxFile,type, source, _successCallback);
-	},
-
-	putObject : function(data) {
-		var type = data.type;
-		var url = data.url;
-		var files = data.files;
-		_successCallback = data.success;
-		_processCallback = data.process;
-		_init();
-		_putObject(type, url, files, _processCallback, _successCallback);
-	},
-
-	createDirectory : function(data) {
-		var type = data.type;
-		var url = data.url;
-		var name = data.name;
-		_successCallback = data.success;
-		_init();
-		_createDirectory(type, url, name, _successCallback);
-	},
-
-	getObject : function(data) {
-		var type = data.type;
-		var url = data.url;
-		_successCallback = data.success;
-		_init();
-		_getObject(type, url, _successCallback);
-	},
-
-	renameObject : function(data) {
-		var type = data.type;
-		var url = data.url;
-		var newName = data.newName;
-		_successCallback = data.success;
-		_init();
-		_renameObject(type, url, newName, _successCallback);
-	},
-
-	deleteObject : function(data) {
-		var type = data.type;
-		var url = data.url;
-		_successCallback = data.success;
-		_init();
-		_deleteObject(type, url, _successCallback);
-	},
-
-	moveObject : function(data) {
-		var type = data.type;
-		var srcPath = data.srcPath;
-		var destPath = data.destPath;
-		_successCallback = data.success;
-		_init();
-		_moveObject(type, srcPath, destPath, _successCallback);
+		_getResource(window.location.href,callback.success);
 	}
 }
 
-window.AppJsBridge.service.device = {
-	getDeviceList : function(data) {
+window.AppJsBridge.service.userService = {
+	getCurrentUserInfo : function(data) {
 		_successCallback = data.success;
-		if (data.error) {
-			_failCallback = data.error;
-		} else if (data.fail) {
-			_failCallback = data.fail;
-		}
+		_failCallback = data.error;
 		_init();
-		_getDeviceList(_successCallback, _failCallback);
+		_getCurrentUserInfo(_successCallback, _failCallback);
 	}
 }
 
@@ -293,139 +145,271 @@ window.AppJsBridge.service.videoplayer = {
 		_failCallback = data.error;
 		_init();
 		_initVedio(_successCallback, _failCallback);
+	},
+	
+	stop : function(data) {
+		_successCallback = data.success;
+		_failCallback = data.error;
+		_init();
+		_stopDisplayCamera(_successCallback, _failCallback);
+	},
+	
+	snapshot : function(data) {
+		_successCallback = data.success;
+		_failCallback = data.error;
+		_init();
+		_cameraSnapShot(_successCallback, _failCallback);
+	},
+	
+	record : function(data) {
+		_successCallback = data.success;
+		_failCallback = data.error;
+		_init();
+		_cameraRecord(_successCallback, _failCallback);
+	},
+	
+	stopRecord : function(data) {
+		_successCallback = data.success;
+		_failCallback = data.error;
+		_init();
+		_cameraStopRecord(_successCallback, _failCallback);
+	},
+	
+	startAudioTalk : function(data) {
+		_successCallback = data.success;
+		_failCallback = data.error;
+		_init();
+		_cameraStartAudioTalk(_successCallback, _failCallback);
+	},
+	
+	stopAudioTalk : function(data) {
+		_successCallback = data.success;
+		_failCallback = data.error;
+		_init();
+		_cameraStopAudioTalk(_successCallback, _failCallback);
+	},
+	
+	move : function(data) {
+		_successCallback = data.success;
+		_failCallback = data.error;
+		_init();
+		_cameraMove(data.direction, _successCallback, _failCallback);
+	},
+	
+	openNativePlayer:function(data){
+		_successCallback = data.success;
+		_failCallback = data.error;
+		_init();
+		_openNativePlayer(data.sn,_successCallback, _failCallback);
+	},
+	
+	getOptions:function(data){
+		var callback = regesterCallback(data);
+		_init();
+		_getOptions(data.sn,callback.success, callback.error);
 	}
 	
-}
-
-window.AppJsBridge.service.snapshot = {
-	getLatestSnapshot : function(data) {
-		_successCallback = data.success;
-		_failCallback = data.error;
-		_init();
-		_getLatestSnapshot(_successCallback, _failCallback);
-	},
-	openVideoView : function(data) {
-		_successCallback = data.success;
-		_failCallback = data.error;
-		var url = data.url;
-		_init();
-		_openVideoView(url, "_successCallback");
-	}
 }
 
 /**
  * 安防模式
  */
-window.AppJsBridge.service.security = {
-	setArmState : function(data) {
-		_successCallback = data.success;
-		_failCallback = data.error;
-		_init();
-		_setArmState(data.state, _successCallback, _failCallback);
-	},
-	getArmState : function(data) {
-		_successCallback = data.success;
-		_failCallback = data.error;
-		_init();
-		_getArmState(_successCallback, _failCallback)
-	},
-
+window.AppJsBridge.service.securityService = {
 	getCurrentMode : function(data) { // 获取当前设防模式
-		_successCallback = data.success;
-		_failCallback = data.fail;
+		var callback = regesterCallback(data);
 		_init();
-		_getCurrentMode(_successCallback, _failCallback)
+		_getCurrentMode(callback.success, callback.error)
 	},
-
 	setCurrentMode : function(data) { // 设置当前设防模式
-		_successCallback = data.success;
-		_failCallback = data.fail;
+		var callback = regesterCallback(data);
 		_init();
-		_setCurrentMode(data.mode, _successCallback, _failCallback)
+		_setCurrentMode(data.mode, callback.success, callback.error)
 	},
 
 	getModeDetail : function(data) { // 获取当前设防模式详细信息
-		_successCallback = data.success;
-		_failCallback = data.fail;
+		var callback = regesterCallback(data);
 		_init();
-		_getModeDetail(data.mode, _successCallback, _failCallback)
+		_getModeDetail(data.mode,callback.success, callback.error)
 	},
 
 	setModeDetail : function(data) { // 设置当前设防模式详细信息
-		_successCallback = data.success;
-		_failCallback = data.fail;
+		var callback = regesterCallback(data);
 		_init();
-		_setModeDetail(data.content, _successCallback, _failCallback)
+		_setModeDetail(data.content, callback.success, callback.error)
 	}
 }
 
-window.AppJsBridge.service.userInfo = {
-	initUserInfo : function(data) {
 
-	},
-	createUserView : function(data) {
-
-	}
-}
-
-window.AppJsBridge.service.homeNet = {
-	getConnectedDevice : function(data) {
-		_successCallback = data.success;
-		_failCallback = data.error;
+window.AppJsBridge.service.networkService = {
+	getNetworkInfo : function(data) {
+		var callback = regesterCallback(data);
 		_init();
-		_queryDevicesInfo(_successCallback, _failCallback);
-
-	},
-	registerTrafficHandler : function(data) {
-		_successCallback = data.success;
-		_failCallback = data.error;
-		_init();
-		_registerTrafficHandler(_successCallback, _failCallback);
-	}
-
-}
-
-window.AppJsBridge.service.appStore = {
-	getPluginList : function(data) {
-		_successCallback = data.success;
-		_failCallback = data.error;
-		_init();
-		_queryHotPluginList(_successCallback, _failCallback)
-	}
-}
-
-window.AppJsBridge.service.smartScene = {
-	getClickSceneList : function(data) {
-		_successCallback = data.success;
-		_failCallback = data.error;
-		_init();
-		_queryClickSceneList(_successCallback, _failCallback)
+		_getNetworkInfo(callback.success, callback.error);
 	}
 }
 
 /**
- * 获取环境监控数据。
+ * 获取智能设备数据
  */
-window.AppJsBridge.service.environment = {
-	getCurrentData : function(data) {
-		_successCallback = data.success;
-		_failCallback = data.fail;
+window.AppJsBridge.service.deviceService = {
+	//获取设备对象列表
+	getDevice:function(data) {
+		 var callback = regesterCallback(data);
 		_init();
-		_getEnviCurrentData(_successCallback, _failCallback)
+		_getSmartDeviceList(data.sn,callback.success, callback.error)
+	},
+	getDeviceList : function(data) {
+		var callback = regesterCallback(data);
+		_init();
+		_getSmartDeviceList(null,callback.success, callback.error)
+	},
+	
+	/*
+	getDeviceBySn:function(data) {
+		 var callback = regesterCallback(data);
+		_init();
+		_getSmartDeviceList(data.sn,callback.success, callback.error)
+	},
+	*/
+	
+	//通过sn获取设备列表 (传入的sn是一个数组)
+	getDeviceBySnList : function(data) {
+		 var callback = regesterCallback(data);
+		_init();
+		_getSmartDeviceBySnList(data.sn,callback.success, callback.error)
+	},
+	//通过设备类型来获取设备列表 (参数 设备类型)
+	getDeviceByClass : function(data) {
+		 var callback = regesterCallback(data);
+		_init();
+		_getSmartDeviceByClass(data.deviceClass,callback.success, callback.error)
+	},
+	//通过设备类型来获取设备列表 (参数 设备类型数组)
+	getDeviceByClasses : function(data) {
+		 var callback = regesterCallback(data);
+		_init();
+		_getSmartDeviceByClasses(data.deviceClasses,callback.success, callback.error)
+	},
+	//智能设备对应的--执行动作
+	doAction : function(data) {
+		 var callback = regesterCallback(data);
+		_init();
+		_smartDeviceDoAction(data,callback.success, callback.error)
+	},
+	
+	getCurrentDeviceSn:function(){
+		var sn = decodeURIComponent(getUrlParams(location.href).sn);
+		return sn;
+	},
+	
+	getMetaInfoBySn:function(data){
+		var callback = regesterCallback(data);
+		_init();
+		_getMetaInfoBySn(data.sn,callback.success, callback.error)
+	},
+	
+	getMetaInfoByProductName :function(data){
+		var callback = regesterCallback(data);
+		_init();
+		_getMetaInfoByProductName(data.manufacturer,data.productName,callback.success, callback.error)
+	},
+
+	doConfig : function(data) {
+		 var callback = regesterCallback(data);
+		_init();
+		_smartDeviceDoConfig(data,callback.success, callback.error)
 	}
+
 }
 
 /**
- * // 获取ＯＮＴ下挂设备 window.AppJsBridge.service.homeNet.getConnectedDevice({ success :
- * function(res) { var deviceList = res.deviceList for ( var index in
- * deviceList) { var name = deviceList[index].deviceName; // 设备名称 var mac =
- * deviceList[index].deviceMac; // 设备mac var ip = deviceList[index].deviceIp; //
- * 设备对应的ip } }, fail : function() { } })
- *  // 获取ＯＮＴ的上下行流量 window.AppJsBridge.service.homeNet.registerTrafficHandler({
- * callback : function(res) { var upTraffic = res.upTraffic; // 上行流量 Kbps var
- * downTraffic = res.downTraffic // 下行流量 Kbps }, fail : function() { } })
- * 
+ * 新增需求 (TCP/UDP SOCKET API 实现与ONT近端SOCKET请求的JS端API)
  */
+window.AppJsBridge.service.socketService = {
+		//1.1 连接
+		connect:function(data) {
+			_successCallback = data.success;
+			_failCallback = data.error;
+			_messageCallback = data.message;
+			_init();
+			_serviceSocketConnect(data,_messageCallback,_successCallback,_failCallback);
+		},
+		//1.2 断开连接
+		disconnect:function(data) {
+			var connectId = data.connectId;
+			_successCallback = data.success;
+			_init();
+			_serviceSocketDisconnect(connectId, _successCallback);
+		},
+		//1.3发送数据
+		send :function(data) {
+			var connectId = data.connectId;
+			var sendData  = data.data;
+			_successCallback = data.success;
+			_init();
+			_serviceSocketSend(connectId, sendData, _successCallback);
+		},
+		getGateWayIp: function(data) {
+			_successCallback = data.success;
+			_failCallback = data.error;
+			_init();
+			_getGateWayIp(_successCallback, _failCallback);
+		}
+}
+
+/**
+ * 增加applicationService调用应用插件  
+ */
+window.AppJsBridge.service.applicationService = {
+	//插件调用--执行动作
+	doAction : function(data) {
+		 var callback = regesterCallback(data);
+		_init();
+		_applicationServiceDoAction(data,callback.success,callback.error);
+	},
+	showTitleBar:function(){
+		_init();
+		_showTitleBar();
+	},
+	hideTitleBar:function(){
+		_init();
+		_hideTitleBar();
+	},
+	setTitleBar :function(title){
+		_init();
+		_setTitleBar(title);
+	},
+	closePage :function(data){
+		_init();
+		_successCallback = data.success;
+		_failCallback = data.error;
+		_back(_successCallback, _failCallback);
+	},
+	openURL:function(data){
+		_successCallback = data.success;
+		_failCallback = data.error;
+		_init();
+		_openURL(data, _successCallback, _failCallback);
+	},
+	//给卡片添加【发现更多】的点击事件。
+	addWidgetMoreAction:function(fun){
+		_init();
+		_addWidgetMoreAction(fun);
+	},
+	
+	showCurrentWidget:function(){
+		_init();
+		_showCurrentWidget()
+	},
+	
+	hideCurrentWidget:function(){
+		_init();
+		_hideCurrentWidget();
+		
+	}
+}
+
+
 /**
  * 转发请求消息到第三方服务器
  */
@@ -438,46 +422,6 @@ window.AppJsBridge.service.securityService = {
 	}
 }
 
-window.AppJsBridge.service.broadbandService = {
-	start:function(data){
-		_successCallback = data.success;
-		_failCallback = data.error;
-		_init();
-		_speedupStart(data.data,_successCallback,_failCallback);
-	},
-	
-	stop:function(data){
-		_successCallback = data.success;
-		_failCallback = data.error;
-		_init();
-		_speedupStop(data.data,_successCallback,_failCallback);
-	},
-	getWanl2tpTunnel:function(data){
-		_successCallback = data.success;
-		_failCallback = data.error;
-		_init();
-		_getWanl2tpTunnel(data.data,_successCallback,_failCallback);
-	},
-	createWanl2tpTunnel:function(data){
-		_successCallback = data.success;
-		_failCallback = data.error;
-		_init();
-		_createWanl2tpTunnel(data.data,_successCallback,_failCallback);
-	},
-	attachWanl2tpTunnel:function(data){
-		_successCallback = data.success;
-		_failCallback = data.error;
-		_init();
-		_attachWanl2tpTunnel(data.data,_successCallback,_failCallback);
-	},
-	removeWanl2tpTunnel:function(data){
-		_successCallback = data.success;
-		_failCallback = data.error;
-		_init();
-		_removeWanl2tpTunnel(data.data,_successCallback,_failCallback);
-	}
-
-}
 
 window.AppJsBridge.service.speedupService = {
 	// 启动/停止提速
@@ -523,23 +467,240 @@ window.AppJsBridge.service.speedupService = {
 		_queryUseRecord(data, _successCallback, _failCallback);
 	}
 }
+
+/**
+ * 对wifi的相关操作。
+ */
+window.AppJsBridge.service.wifiService = {
+	getControllerWifi:function(data){
+		var callback = regesterCallback(data);
+		_init();
+		_getControllerWifi(callback.success,callback.error);
+	},
+
+	wifiSwitch:function(data){
+		var callback = regesterCallback(data);
+		_init();
+		_wifiSwitch(data.ssid,data.password,callback.success,callback.error);
+ 	},
+ 	
+ 	getWifiList:function(data){
+ 		var callback = regesterCallback(data);
+		_init();
+		_getWifiList(callback.success,callback.error);
+ 	}
+}
+
+/**
+ * 二维码扫描
+ */
+window.AppJsBridge.service.scanService = {
+	scan : function(data) {
+		_successCallback = data.success;
+		_failCallback = data.error;
+		_init();
+		_scan(_successCallback, _failCallback);
+	}
+}
+
+window.AppJsBridge.service.storageService = {
+	
+	listObjects : function(data) {
+		var type = data.type;
+		var url = data.url;
+		_successCallback = data.success;
+		_init();
+		_listObjects(type, url, _successCallback);
+	},
+	putObject : function(data) {
+		var type = data.type;
+		var url = data.url;
+		var files = data.files;
+		_successCallback = data.success;
+		_processCallback = data.process;
+		_init();
+		_putObject(type, url, files, _processCallback, _successCallback);
+	},
+	chooseFiles : function(data) {
+		var type = data.type;
+		var source = data.source;
+		var maxFile = data.maxFile;
+		_successCallback = data.success;
+		_init();
+		_chooseFiles(maxFile,type, source, _successCallback);
+	},
+	
+	createDirectory : function(data) {
+		var type = data.type;
+		var url = data.url;
+		var name = data.name;
+		_successCallback = data.success;
+		_init();
+		_createDirectory(type, url, name, _successCallback);
+	},
+
+	getObject : function(data) {
+		var type = data.type;
+		var url = data.url;
+		_successCallback = data.success;
+		_init();
+		_getObject(type, url, _successCallback);
+	},
+
+	renameObject : function(data) {
+		var type = data.type;
+		var url = data.url;
+		var newName = data.newName;
+		_successCallback = data.success;
+		_init();
+		_renameObject(type, url, newName, _successCallback);
+	},
+
+	deleteObject : function(data) {
+		var type = data.type;
+		var url = data.url;
+		_successCallback = data.success;
+		_init();
+		_deleteObject(type, url, _successCallback);
+	},
+
+	moveObject : function(data) {
+		var type = data.type;
+		var srcPath = data.srcPath;
+		var destPath = data.destPath;
+		_successCallback = data.success;
+		_init();
+		_moveObject(type, srcPath, destPath, _successCallback);
+	},
+	
+	getExternalStorageStorageData: function(data) {
+		
+		_successCallback = data.success;
+		_failCallback = data.error;
+		_init();
+		_getExternalStorageData( _successCallback,_failCallback);
+	},
+	
+	getCloudStorageData: function(data) {
+		
+		_successCallback = data.success;
+		_failCallback = data.error;
+		_init();
+		_getCloudStorageData( _successCallback,_failCallback);
+	},
+	
+	openStorageImageViewer:function(data){
+		var callback = regesterCallback(data);
+		_init();
+		_openStorageImageViewer(data.type,data.url,callback.success,callback.error);
+	},
+	
+	openStorageVideoPlayer:function(data){
+		var callback = regesterCallback(data);
+		_init();
+		_openStorageVideoPlayer(data.type,data.url,callback.success,callback.error);
+	}
+}
+
+window.AppJsBridge.service.broadbandService = {
+	speedup : {
+		start:function(data){
+			_successCallback = data.success;
+			_failCallback = data.error;
+			_init();
+			_speedupStart(data.data,_successCallback,_failCallback);
+		},
+		
+		stop:function(data){
+			_successCallback = data.success;
+			_failCallback = data.error;
+			_init();
+			_speedupStop(data.data,_successCallback,_failCallback);
+		}
+	}
+	
+}
+
+window.AppJsBridge.service.vpnService = {
+	
+	wanGetL2tpTunnelStatus:function(data){
+		_successCallback = data.success;
+		_failCallback = data.error;
+		_init();
+		_wanGetL2tpTunnelStatus(data.data,_successCallback,_failCallback);
+	},
+	wanCreateL2tpTunnel:function(data){
+		_successCallback = data.success;
+		_failCallback = data.error;
+		_init();
+		_wanCreateL2tpTunnel(data.data,_successCallback,_failCallback);
+	},
+	wanAttachL2tpTunnel:function(data){
+		_successCallback = data.success;
+		_failCallback = data.error;
+		_init();
+		_wanAttachL2tpTunnel(data.data,_successCallback,_failCallback);
+	},
+	wanRemoveL2tpTunnel:function(data){
+		_successCallback = data.success;
+		_failCallback = data.error;
+		_init();
+		_wanRemoveL2tpTunnel(data.data,_successCallback,_failCallback);
+	},
+	wanDetachL2tpTunnel:function(data){
+		_successCallback = data.success;
+		_failCallback = data.error;
+		_init();
+		_wanDetachL2tpTunnel(data.data,_successCallback,_failCallback);
+	}
+
+}
+
+
+window.AppJsBridge.service.messageService = {
+	
+	sendMsgToGateway: function(data) {
+		var parameter = data.parameter;
+		_successCallback = data.success;
+		_failCallback = data.error;
+		_init();
+		_sendMsgToGateway(parameter, _successCallback);
+	}
+
+}
+
 /**
  * 插件数据查询和插件备份接口
  */
-window.AppJsBridge.service.pluginService = {
-		getPluginData : function(data) {
+window.AppJsBridge.service.dataService = {
+		put: function(data) {
 			_successCallback = data.success;
 			_failCallback = data.error;
 			_init();
-			_getPluginData(data.data,_successCallback, _failCallback);
+			_putData(data["key"],data.data,_successCallback, _failCallback);
 		},
-		updatePluginData : function(data) {
+		remove: function(data) {
 			_successCallback = data.success;
 			_failCallback = data.error;
 			_init();
-			_updatePluginData(data.data,_successCallback, _failCallback);
+			_removeData(data["key"],_successCallback, _failCallback);
+		},
+		clear: function(data) {
+			_successCallback = data.success;
+			_failCallback = data.error;
+			_init();
+			_clearData(_successCallback, _failCallback);
+		},
+		list: function(data) {
+			_successCallback = data.success;
+			_failCallback = data.error;
+			_init();
+			_listData(_successCallback, _failCallback);
 		}
 	}
+
+
+
 // 初始化设备信息。
 var _init = function() {
 
@@ -584,6 +745,13 @@ function recogniseDevice() {
 	}
 }
 
+var _sendMsgToGateway = function(params, _successCallback) {
+	if (isAndroid) {
+		// android请求。
+		_currentBridge.sendMsgToGateway(params, "_successCallback");
+	}
+}
+
 var _initIOSBridge = function(callback) {
 	if (window.WebViewJavascriptBridge) {
 		callback(WebViewJavascriptBridge)
@@ -598,43 +766,21 @@ var _initIOSBridge = function(callback) {
 	}
 }
 
+var initBridge = function(fun){
+	var intervalTimer = setInterval(function(){
+		if(_currentBridge){
+			clearInterval(intervalTimer);
+			fun();
+		}
+	},10);
+}
+
 var _initAndroidBridge = function(callback) {
 	if (window.AppJSBridge) {
 		callback(window.AppJSBridge);
 	} else if (window.deviceService) {
 		callback(window.deviceService);
-	}
-}
 
-
-// 发请求。包括查询状态，及发送操作命令。
-var _callDevice = function(params, success, error) {
-	
-	var frameName = null;
-	try {
-		if (getUrlParams(location.href).frameName) {
-			frameName = decodeURIComponent(getUrlParams(location.href).frameName)
-		} else {
-			frameName = null;
-		}
-	} catch (e) {
-		frameName = null;
-	}
-
-	if (isAndroid) {
-		// android请求。
-		if(frameName != null){
-			_currentBridge.callDevice(params,frameName,"_successCallback");
-		}else{
-			_currentBridge.callDevice(params,"","_successCallback");
-		}
-			
-	} else {
-		// IOS请求。
-		var param = {};
-		param.request = "callDeviceSongShu";
-		param.params = params;
-		_currentBridge.send(param, success);
 	}
 }
 
@@ -642,11 +788,12 @@ var _getSmartDevice = function(success, error) {
 	var sn = decodeURIComponent(getUrlParams(location.href).sn);
 	var frameName = null;
 	try {
-		frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+		if(getUrlParams(location.href).frameName){
+			frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+		}
 	} catch (e) {
 		frameName = null;
 	}
-	console.log(frameName);
 	// alert(frameName);
 	if (isAndroid) {
 		// android请求。
@@ -654,19 +801,20 @@ var _getSmartDevice = function(success, error) {
 			_currentBridge.getSmartDevice(JSON.stringify({
 				"sn" : sn,
 				"frameName" : frameName,
-				"success" : "_successCallback",
-				"error" : "_failCallback"
+				"success" : success,
+				"error" : error
 			}));
 
 		} else {
 
 			if (frameName != null) {
-				_currentBridge.initWedgistData(frameName, "_successCallback");
+				_currentBridge.initWedgistData(frameName, success);
 			} else {
 				var data = _currentBridge.getSmartDevice(sn);
 				console.log(data);
 				console.log(success);
-				success(data);
+				var callback = eval(success);
+				callback(data);
 			}
 		}
 
@@ -694,62 +842,8 @@ var _getSmartDevice = function(success, error) {
 
 }
 
-var _getAddedDeviceList = function(success,error){
-	var frameName = null;
-	try {
-		if(getUrlParams(location.href).frameName){
-			frameName = decodeURIComponent(getUrlParams(location.href).frameName);
-		}else{
-			frameName = null;
-		}
-		
-	} catch (e) {
-		frameName = null;
-	}
-	
-	if(isAndroid){
-		if(frameName){
-	            _currentBridge.getAddedDeviceList(frameName,success);
-	        }else{
-	            _currentBridge.getAddedDeviceList("",success);
-	        }
-	}
-	else if(isIOS)
-	{
-		var param={};
-		param.request="getAddDeviceList";
-		_currentBridge.send(param, success);
-	}
-	
-	
-}
-
-// 响应设备点击事件
-var swith = function(param, success, error) {
-	var sn = decodeURIComponent(getUrlParams(location.href).sn);
-	if (isAndroid) {
-		// android请求。
-		var data = _currentBridge.clickStatusButton(param, sn);
-		success(data);
-	} else if (isIOS) {
-		// IOS请求。
-		var params = {};
-		params.request = "clickStatus";
-		params.sn = sn;
-		params.parameter = param;
-		_currentBridge.send(param, success);
-	} else {
-		_currentBridge.swithDevice({
-			"sn" : sn,
-			"param" : param,
-			"successCallback" : success,
-			"errorCallback" : error
-		});
-	}
-}
-
 // 响应回退事件
-var back = function(success, error) {
+var _back = function(success, error) {
 	if (isAndroid) {
 		// android请求。
 		var data = _currentBridge.doAction('exit', '');
@@ -760,32 +854,33 @@ var back = function(success, error) {
 		param.request = "goBack";
 		_currentBridge.send(param, success);
 	} else {
-
-	}
-}
-
-// 获取视频缩略图
-var _getLatestSnapshot = function(_successCallback, _failCallback) {
-	var frameName = null;
-	try {
-		frameName = decodeURIComponent(getUrlParams(location.href).frameName)
-	} catch (e) {
-		frameName = null;
-	}
-	if (frameName != null) {
-		_currentBridge.getSnapShotList(frameName, "_successCallback");
+		
 	}
 }
 
 var _initVedio = function(_successCallback, _failCallback) {
-	var frameName = null;
-	try {
-		frameName = decodeURIComponent(getUrlParams(location.href).frameName)
-	} catch (e) {
-		frameName = null;
+
+	if(isAndroid)
+	{
+		var frameName = null;
+		try {
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			}
+		} catch (e) {
+			frameName = null;
+		}
+		if (frameName != null) {
+			_currentBridge.initVedio(frameName, "_successCallback");
+		}	
 	}
-	if (frameName != null) {
-		_currentBridge.initVedio(frameName, "_successCallback");
+	else if(isIOS)
+	{
+		var param = {};
+		
+		param.request = "initVedio";
+		
+		_currentBridge.send(param,_successCallback);
 	}
 }
 
@@ -793,9 +888,9 @@ var _openActivity = function(params, _successCallback) {
 	if (isAndroid) {
 		var frameName = null;
 		try {
-
-			frameName = decodeURIComponent(getUrlParams(location.href).frameName)
-
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			}
 		} catch (e) {
 			frameName = null;
 		}
@@ -810,53 +905,418 @@ var _openActivity = function(params, _successCallback) {
 		params.request = "openActivity";
 		_currentBridge.send(params, _successCallback);
 	}
-
-}
-
-var _showMore = function() {
-	_currentBridge.showMoreAboutCamera();
-}
-
-var _createVideoView = function(param, _successCallback, _failCallback) {
-	var jsonObj = {};
-	if (param) {
-		if (param.sn) {
-			jsonObj.sn = param.sn;
-		} else {
-			jsonObj.sn = "";
-		}
-		if (param.layout) {
-			jsonObj.layout = {};
-			if (param.layout.x) {
-				jsonObj.layout.x = param.layout.x;
-			} else {
-				jsonObj.layout.x = 0;
-			}
-			if (param.layout.y) {
-				jsonObj.layout.y = param.layout.y;
-			} else {
-				jsonObj.layout.y = 0;
-			}
-			if (param.layout.width) {
-				jsonObj.layout.width = param.layout.width;
-			} else {
-				jsonObj.layout.width = 0;
-			}
-			if (param.layout.height) {
-				jsonObj.layout.height = param.layout.height;
-			} else {
-				jsonObj.layout.height = 0;
-			}
-		}
-		_currentBridge.createVideoView(JSON.stringify(jsonObj),
-				"_successCallback", "_failCallback");
+	else
+	{
+		_currentBridge.openActivity(params, _successCallback);
 	}
 
 }
 
-// 调用获取ont实时流量
-var _registerTrafficHandler = function(_successCallback, _failCallback) {
-	// alert("getTraffic");
+var _openURL = function(data, _successCallback, _failCallback){
+	
+	var title = data.title;
+	
+	var url = data.url;
+	var urlRoot = url.substring(0,url.indexOf("/")+1);
+	var currentUrl = window.location.href;
+	var realUrl = currentUrl.substring(0,currentUrl.lastIndexOf(urlRoot))+url
+	realUrl = encodeURI(realUrl);
+	
+	if(isAndroid)
+	{
+		var frameName = null;
+		try {
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName);
+			}
+		} catch (e) {
+			frameName = null;
+		}
+	
+		if (frameName != null) {
+			_currentBridge.openURL(realUrl,title,frameName,
+				"_successCallback");
+		} else {
+			_currentBridge.openURL(realUrl,title, "",
+				"_successCallback");
+		}
+	
+	}
+	//添加IOS的openURL分支的适配
+	else if(isIOS)
+	{
+			var param = {};
+			
+			param.request = "openURL";
+			param.title = title;
+			param.realUrl = realUrl;
+			
+			_currentBridge.send(param,_successCallback);
+	
+	}
+	else
+	{
+		_currentBridge.openURL(realUrl,title, "",
+				"_successCallback");
+  }	
+}
+
+var _stopDisplayCamera = function(_successCallback, _failCallback){
+	
+	if(isAndroid)
+	{
+		var frameName = null;
+		try {
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName);
+			}
+		} catch (e) {
+			frameName = null;
+		}
+	
+		if(frameName != null){
+			_currentBridge.stopDisplayCamera(frameName,"_successCallback");
+		}else{
+			_currentBridge.stopDisplayCamera("","_successCallback");
+		}	
+	}
+	else if(isIOS)
+	{
+		var param = {};
+		
+		param.request = "stopDisplayCamera";
+			
+		_currentBridge.send(param,_successCallback);
+	}
+	
+}
+
+var _cameraSnapShot = function(_successCallback, _failCallback){
+	
+	if(isAndroid)
+	{
+		var frameName = null;
+		try {
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName);
+			}
+		} catch (e) {
+			frameName = null;
+		}
+	
+		if(frameName != null){
+			_currentBridge.cameraSnapShot(frameName,"_successCallback");
+		}else{
+			_currentBridge.cameraSnapShot("","_successCallback");
+		}
+		
+	}
+	else if(isIOS)
+	{
+		var param = {};
+		
+		param.request = "cameraSnapShot";
+		
+		_currentBridge.send(param,_successCallback);
+	}
+	
+}
+
+var _cameraRecord = function(_successCallback, _failCallback){
+
+	if(isAndroid)
+	{
+		var frameName = null;
+		try {
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName);
+			}
+		} catch (e) {
+			frameName = null;
+		}
+	
+		if(frameName != null){
+			_currentBridge.cameraStartRecord(frameName,"_successCallback");
+		}else{
+			_currentBridge.cameraStartRecord("","_successCallback");
+		}	
+	}
+	else if(isIOS)
+	{
+		var param = {};
+	
+		param.request = "cameraRecord";
+		
+		_currentBridge.send(param,_successCallback);
+	}
+	
+	
+	
+}
+
+var _cameraStopRecord = function(_successCallback, _failCallback){
+	
+	if(isAndroid)
+	{
+		var frameName = null;
+		try {
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName);
+			}
+		} catch (e) {
+			frameName = null;
+		}
+	
+		if(frameName != null){
+			_currentBridge.cameraStopRecord(frameName,"_successCallback");
+		}else{
+			_currentBridge.cameraStopRecord("","_successCallback");
+		}
+	}
+	else if(isIOS)
+	{
+		var param = {};
+		
+		param.request = "cameraStopRecord";
+		
+		_currentBridge.send(param._successCallback);
+	}
+	
+}
+
+var _cameraStartAudioTalk = function(_successCallback, _failCallback){
+	
+	if(isAndroid)
+	{
+		var frameName = null;
+		try {
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName);
+			}
+		} catch (e) {
+			frameName = null;
+		}
+	
+		if(frameName != null){
+			_currentBridge.cameraStartAutoTaik(frameName,"_successCallback");
+		}else{
+			_currentBridge.cameraStartAutoTaik("","_successCallback");
+		}
+	}
+	else if(isIOS)
+	{
+		var param = {};
+		
+		param.request = "cameraStartAudioTalk";
+		
+		_currentBridge.send(param,_successCallback);
+
+	}
+}
+
+var _cameraStopAudioTalk = function(_successCallback, _failCallback){
+	
+	if(isAndroid)
+	{
+		var frameName = null;
+		try {
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName);
+			}
+		} catch (e) {
+			frameName = null;
+		}
+	
+		if(frameName != null){
+			_currentBridge.cameraStopAutoTaik(frameName,"_successCallback");
+		}else{
+			_currentBridge.cameraStopAutoTaik("","_successCallback");
+		}
+	}
+	else if(isIOS)
+	{
+		var param = {};
+
+		param.request = "cameraStopAudioTalk";
+		_currentBridge.send(param,_successCallback);
+	}
+}
+
+var _cameraMove = function(direction,_successCallback, _failCallback){
+
+	if(isAndroid)
+	{
+		var frameName = null;
+			try {
+				if(getUrlParams(location.href).frameName){
+					frameName = decodeURIComponent(getUrlParams(location.href).frameName);
+				}
+			} catch (e) {
+					frameName = null;
+			}
+	
+		if(frameName != null){
+			_currentBridge.cameraMove(direction,frameName,"_successCallback");
+		}else{
+			_currentBridge.cameraMove(direction,"","_successCallback");
+		}
+	}
+	else if(isIOS)
+	{
+		var param = {};
+		
+		param.request = "cameraMove";
+		param.direction = direction;
+		
+		_currentBridge.send(param,_successCallback);
+	}
+	
+}
+
+var _openNativePlayer = function(sn,_successCallback, _failCallback){
+
+	if(isAndroid)
+	{
+		var frameName = null;
+			try {
+				if(getUrlParams(location.href).frameName){
+					frameName = decodeURIComponent(getUrlParams(location.href).frameName);
+			}
+		} catch (e) {
+			frameName = null;
+		}
+	
+		if(frameName != null){
+			_currentBridge.openNativePlayer(sn,frameName,"_successCallback");
+		}else{
+			_currentBridge.openNativePlayer(sn,"","_successCallback");
+		}
+	}
+	else if(isIOS)
+	{
+		var param = {};
+		
+		param.sn = sn;
+		param.request = "openNativePlayer";
+		
+		_currentBridge.send(param,_successCallback);
+	}
+
+	
+}
+
+var _getOptions = function(sn, success, error){
+	if(isAndroid){
+		var frameName = null;
+		try {
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName);
+			}
+		} catch (e) {
+			frameName = null;
+		}
+		
+		if(frameName != null){
+			_currentBridge.getCameraOptions(sn,frameName,success);
+		}else{
+			_currentBridge.getCameraOptions(sn,"",success);
+		}
+	}
+	
+	else if(isIOS)
+	{
+		var param = {};
+		
+		param.request = "getOptions";
+		param.sn = sn;
+		
+		_currentBridge.send(param,eval(success));
+		
+	}
+	
+}
+
+var _createVideoView = function(param, _successCallback, _failCallback) {
+	
+	if(isAndroid)
+	{
+		var jsonObj = {};
+		if (param) {
+			if (param.sn) {
+				jsonObj.sn = param.sn;
+			} else {
+				jsonObj.sn = "";
+			}
+			if (param.layout) {
+				jsonObj.layout = {};
+				if (param.layout.x) {
+					jsonObj.layout.x = param.layout.x;
+				} else {
+					jsonObj.layout.x = 0;
+				}
+				if (param.layout.y) {
+					jsonObj.layout.y = param.layout.y;
+				} else {
+					jsonObj.layout.y = 0;
+				}
+				if (param.layout.width) {
+					jsonObj.layout.width = param.layout.width;
+				} else {
+					jsonObj.layout.width = 0;
+				}
+				if (param.layout.height) {
+					jsonObj.layout.height = param.layout.height;
+				} else {
+					jsonObj.layout.height = 0;
+				}
+			}
+		_currentBridge.createVideoView(JSON.stringify(jsonObj),
+				"_successCallback", "_failCallback");
+		}
+	
+	}
+	else if(isIOS)
+	{
+		var paramObj = {};
+		
+		if (param) {
+			if (param.sn) {
+				paramObj.sn = param.sn;
+			} else {
+				paramObj.sn = "";
+			}
+			if (param.layout) {
+				paramObj.layout = {};
+				if (param.layout.x) {
+					paramObj.layout.x = param.layout.x;
+				} else {
+					paramObj.layout.x = 0;
+				}
+				if (param.layout.y) {
+					paramObj.layout.y = param.layout.y;
+				} else {
+					paramObj.layout.y = 0;
+				}
+				if (param.layout.width) {
+					paramObj.layout.width = param.layout.width;
+				} else {
+					paramObj.layout.width = 0;
+				}
+				if (param.layout.height) {
+					paramObj.layout.height = param.layout.height;
+				} else {
+					paramObj.layout.height = 0;
+				}
+			}
+			paramObj.request = "createVideoView";
+			_currentBridge.send(paramObj,_successCallback);
+		}
+	}
+	
+}
+
+// 获取网络基本服务(智能设备数量,网络设备数量,连接状态)
+var _getNetworkInfo = function(success, error) {
 	if (isAndroid) {
 		var frameName = null;
 		try {
@@ -868,130 +1328,28 @@ var _registerTrafficHandler = function(_successCallback, _failCallback) {
 		} catch (e) {
 			frameName = null;
 		}
-		_currentBridge.getrealtimeTraffic(frameName, "_successCallback");
+		_currentBridge.getNetworkInfo(frameName, success);
 	} else if (isIOS) {
-		// alert("ios");
 		var param = {};
 		param.request = "getONTDevice";
-		// alert(_currentBridge);
-		_currentBridge.send(param, _successCallback);
+		_currentBridge.send(param, eval(success));
 	}
-}
-
-// 调用获取ont下挂设备详情
-var _queryDevicesInfo = function(_successCallback, _failCallback) {
-	var frameName = null;
-	try {
-		if (getUrlParams(location.href).frameName) {
-			frameName = decodeURIComponent(getUrlParams(location.href).frameName)
-		} else {
-			frameName = null;
-		}
-	} catch (e) {
-		frameName = null;
+	else
+	{
+		_currentBridge.getNetworkInfo(eval(success));
 	}
-	_currentBridge.queryDevicesInfo(frameName, "_successCallback");
-
-}
-
-// 根据url打开视频
-var _openVideoView = function(url, success) {
-	var frameName = null;
-	try {
-		frameName = decodeURIComponent(getUrlParams(location.href).frameName)
-	} catch (e) {
-		frameName = null;
-	}
-	if (url != null) {
-		_currentBridge.openVideoView(url, frameName, "_successCallback");
-	}
-}
-
-var _showMore = function() {
-	_currentBridge.showMoreAboutCamera();
-}
-
-// 获取热门插件
-var _queryHotPluginList = function(_successCallback, _failCallback) {
-	var frameName = null;
-	try {
-		frameName = decodeURIComponent(getUrlParams(location.href).frameName)
-	} catch (e) {
-		frameName = null;
-	}
-
-	if (frameName != null) {
-		_currentBridge.queryHotPluginList(frameName, "_successCallback");
-	}
-}
-
-// 获取点击场景
-var _queryClickSceneList = function(_successCallback, _failCallback) {
-	var frameName = null;
-	try {
-		frameName = decodeURIComponent(getUrlParams(location.href).frameName)
-	} catch (e) {
-		frameName = null;
-	}
-
-	if (frameName != null) {
-		_currentBridge.queryClickSceneList(frameName, "_successCallback");
-	}
-}
-
-var _setArmState = function(state, _successCallback, _failCallback) {
-	if (isAndroid) {
-		var frameName = null;
-		try {
-			frameName = decodeURIComponent(getUrlParams(location.href).frameName)
-		} catch (e) {
-			frameName = null;
-		}
-
-		if (frameName != null) {
-			_currentBridge.setArmState(state, frameName, "_successCallback");
-		}
-	} else if (isIOS) {
-		var param = {};
-		// param.sn = sn;
-		param.request = "setArmState";
-		param.state = state;
-		_currentBridge.send(param, _successCallback);
-	}
-
-}
-
-var _getArmState = function(_successCallback, _failCallback) {
-	if (isAndroid) {
-		var frameName = null;
-		try {
-			frameName = decodeURIComponent(getUrlParams(location.href).frameName)
-		} catch (e) {
-			frameName = null;
-		}
-
-		if (frameName != null) {
-			_currentBridge.getArmState(frameName, "_successCallback");
-		}
-
-	} else if (isIOS) {
-		var param = {};
-		// param.sn = sn;
-		param.request = "getArmState";
-		_currentBridge.send(param, _successCallback);
-	}
-
 }
 
 var _openControlEntry = function(sn, _successCallback) {
 	if (isAndroid) {
 		var frameName = null;
 		try {
-			frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			}
 		} catch (e) {
 			frameName = null;
 		}
-
 		if (frameName != null) {
 			_currentBridge.openControlEntry(sn, frameName, "_successCallback");
 		} else {
@@ -1009,7 +1367,9 @@ var _openConfirm = function(msg, _successCallback) {
 	if (isAndroid) {
 		var frameName = null;
 		try {
-			frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			}
 		} catch (e) {
 			frameName = null;
 		}
@@ -1029,157 +1389,1095 @@ var _openConfirm = function(msg, _successCallback) {
 
 }
 
-var _getEnviCurrentData = function(_successCallback, _failCallback) {
+/**
+ * 获取基本的设备信息(包含SN)
+ */
+var _getSmartDeviceList = function(sn,success, error) {
 	if (isAndroid) {
 		var frameName = null;
 		try {
-			frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			if (getUrlParams(location.href).frameName) {
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			} else {
+				frameName = null;
+			}
 		} catch (e) {
 			frameName = null;
 		}
-		if (frameName != null) {
-			_currentBridge.getEnvironmentData(frameName, "_successCallback");
-		} else {
-			_currentBridge.getEnvironmentData("", "_successCallback");
+		
+		if (window.deviceService) {
+			_currentBridge.getSmartDeviceList(JSON.stringify({
+				"sn" : sn,
+				"frameName" : frameName,
+				"success" : success,
+				"error" : error
+			}));
+
+		} else{
+			 if(sn != null){
+					_currentBridge.getSmartDeviceList(sn,frameName, success);
+			  }else{
+					_currentBridge.getSmartDeviceList(frameName, success); 
+			  }
 		}
+
+		
+		
+	 
+	} else if (isIOS) {
+		var param = {};
+		if(null != sn)
+		 {
+		    param.sn = sn;
+		}
+		param.request = "getSmartDeviceList";
+		_currentBridge.send(param, eval(success));
 	}
+	else
+	{
+		if(sn != null){
+			_currentBridge.getDevice(sn,eval(success));
+	    }else{
+			_currentBridge.getDeviceList(eval(success)); 
+	    }
+	}
+
 }
 
-var _getCurrentMode = function(_successCallback, _failCallback) {
+/**
+ * 通过SN获取设备列表
+ */
+var _getSmartDeviceBySnList = function(params,success, error) {
+	 //这里传入的params是一个sn的json数组
 	if (isAndroid) {
 		var frameName = null;
 		try {
-			frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			if (getUrlParams(location.href).frameName) {
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			} else {
+				frameName = null;
+			}
+		} catch (e) {
+			frameName = null;
+		}
+		if(frameName == null){
+			_currentBridge.getSmartDeviceBySnList(JSON.stringify(params),"", success);
+		}else{
+			_currentBridge.getSmartDeviceBySnList(JSON.stringify(params),frameName, success);
+		}
+			
+	} else if (isIOS) {
+		param.request = "getSmartDeviceBySnList";
+		_currentBridge.send(param, eval(success));
+	}
+	else
+	{
+		_currentBridge.getSmartDeviceBySnList(params,eval(success));
+	}
+
+}
+
+/**
+ * 通过设备类型来获取设备列表 (参数 设备类型)
+ */
+var _getSmartDeviceByClass = function(deviceClass,success, error) {
+	//这里的params是一个字符串，是deviceClass的名称
+	if (isAndroid) {
+		var frameName = null;
+		try {
+			if (getUrlParams(location.href).frameName) {
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			} else {
+				frameName = null;
+			}
+		} catch (e) {
+			frameName = null;
+		}
+		
+		if(frameName != null){
+			_currentBridge.getSmartDeviceByClass(deviceClass,frameName, success);
+		}else{
+			_currentBridge.getSmartDeviceByClass(deviceClass,"", success);
+		}
+			
+	} else if (isIOS) {
+		param.request = "getSmartDeviceByClass";
+		_currentBridge.send(param, eval(success));
+	}
+	else
+	{
+		_currentBridge.getSmartDeviceByClass(deviceClass,eval(success));
+	}
+
+}
+
+/**
+ *通过设备类型来获取设备列表 (参数 设备类型数组)
+ */
+var _getSmartDeviceByClasses = function(params,success, error) {
+	//这里的params是一个字符串，是deviceClass的名称的json数组集合
+	
+	if (isAndroid) {
+		var frameName = null;
+		try {
+			if (getUrlParams(location.href).frameName) {
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			} else {
+				frameName = null;
+			}
+		} catch (e) {
+			frameName = null;
+		}
+		if(frameName != null){
+			_currentBridge.getSmartDeviceByClasses(JSON.stringify(params),frameName,success);
+		}else{
+			_currentBridge.getSmartDeviceByClasses(JSON.stringify(params),"",success);
+		}
+	} else if (isIOS) {
+                var param = {};
+		param.request = "getSmartDeviceByClasses";
+                param.params = params;
+		_currentBridge.send(param, eval(success));
+	}
+	else
+	{
+		_currentBridge.getSmartDeviceByClasses(JSON.stringify(params),eval(success));
+	}
+}
+
+/**
+ *智能设备对应的--执行动作
+ */
+var _smartDeviceDoAction = function(params,success, error) {
+	//这里传入的params包含了deviceClass 设备类型, action 执行动作,parameter 条件数组
+	if (isAndroid) {
+		var frameName = null;
+		try {
+			if (getUrlParams(location.href).frameName) {
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			} else {
+				frameName = null;
+			}
+		} catch (e) {
+			frameName = null;
+		}
+		
+		var devInfo = {
+		"deviceClass":params.deviceClass,
+		"action":params.action,
+		"sn":params.sn
+		};
+		if(frameName == null){
+			_currentBridge.smartDeviceDoAction(JSON.stringify(devInfo),JSON.stringify(params.parameters),"", success);
+		}else{
+			_currentBridge.smartDeviceDoAction(JSON.stringify(devInfo),JSON.stringify(params.parameters),frameName, success);
+		}
+		
+		
+	} else if (isIOS) {
+	
+		var devInfo = {
+		"deviceClass":params.deviceClass,
+		"action":params.action,
+		"sn":params.sn
+		};
+	
+		var param = {};
+		param.request = "smartDeviceDoAction";
+		param.devInfo = devInfo;
+		param.parameters = params.parameters;
+		_currentBridge.send(param, eval(success));
+	}
+	else
+	{
+		_currentBridge.smartDeviceDoAction(params.deviceClass,params.action,params.sn,JSON.stringify(params.parameters),eval(success));
+	}
+}
+
+/**
+ *智能设备对应的--执行配置
+ */
+var _smartDeviceDoConfig = function(params,success, error) {
+	//这里传入的params包含了manufacturer 厂商,brand 品牌, action 执行动作,parameter 条件数组
+	if (isAndroid) {
+		var frameName = null;
+		try {
+			if (getUrlParams(location.href).frameName) {
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			} else {
+				frameName = null;
+			}
+		} catch (e) {
+			frameName = null;
+		}
+		
+		if(frameName == null){
+			_currentBridge.smartDeviceDoConfig(JSON.stringify(params),JSON.stringify(params.parameters),frameName, success);
+		}else{
+			_currentBridge.smartDeviceDoConfig(JSON.stringify(params),JSON.stringify(params.parameters),"", success);
+		}
+		
+	} else if (isIOS) {
+		var param = {};
+		param.request = "smartDeviceDoConfig";
+		param.params = params;
+		param.parameters = params.parameters;
+		_currentBridge.send(param, eval(success));
+	}
+	else
+	{
+		_currentBridge.smartDeviceDoConfig(params.manufacturer,params.brand,params.action,JSON.stringify(params.parameters),eval(success));
+	}
+}
+
+/**
+ * 获取对应设备的能力。目前用于安放。
+ */
+var _getMetaInfoBySn = function(sn,success, error) {
+	if (isAndroid) {
+		var frameName = null;
+		try {
+			if (getUrlParams(location.href).frameName) {
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			} else {
+				frameName = null;
+			}
+		} catch (e) {
+			frameName = null;
+		}
+		
+		if(frameName == null){
+			_currentBridge.getMetaInfoBySn(sn,frameName,success);
+		}else{
+			_currentBridge.getMetaInfoBySn(sn,"",success);
+		}
+	}
+	else if (isIOS) 
+	{
+	//IOS请求
+        var param = {};
+        param.request = "getMetaInfoBySn";
+        param.sn =params.sn;
+        _currentBridge.send(param,eval(success));
+  }
+  else
+  {
+  	_currentBridge.getMetaInfoBySn(sn,eval(success));
+  }			
+	
+}
+
+
+/**
+ * 获取对应设备的能力。目前用于安放。_getMetaInfoByProductName(data.manufacturer,data.productName,callback.success, callback.error)
+ */
+var _getMetaInfoByProductName = function(manufacturer,productName,success, error) {
+	if (isAndroid) {
+		var frameName = null;
+		try {
+			if (getUrlParams(location.href).frameName) {
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			} else {
+				frameName = null;
+			}
+		} catch (e) {
+			frameName = null;
+		}
+		
+		if(frameName == null){
+			_currentBridge.getMetaInfoByProductName(manufacturer,productName,frameName,success);
+		}else{
+			_currentBridge.getMetaInfoByProductName(manufacturer,productName,"",success);
+		}
+	}
+	else if (isIOS) 
+	{
+		//IOS请求
+		var param = {};
+		param.request = "getMetaInfoByProductName";
+		param.manufacturer = manufacturer;
+		param.productName = productName;
+		_currentBridge.send(param,eval(success));
+	}
+	else
+	{
+		_currentBridge.getMetaInfoByProductName(manufacturer,productName,eval(success));
+	}			
+	
+}
+
+
+/**
+ *applicationService调用应用插件--执行动作
+ */
+var _applicationServiceDoAction = function(params,success, error) {
+	//这里传入的params包含了applicationName ,serviceName, action 执行动作,parameter 条件数组
+	var applicationName = params.applicationName;//应用名称
+	var serviceName = params.serviceName;//服务名称
+	var action = params.action;//执行动作名称
+	var parameter = params.parameters; //用户传递过来的数据
+	
+	if (isAndroid) {
+		var frameName = null;
+		try {
+			if (getUrlParams(location.href).frameName) {
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			} else {
+				frameName = null;
+			}
+		} catch (e) {
+			frameName = null;
+		}
+		
+		var appData = {
+		"applicationName": applicationName,
+		"serviceName":serviceName,
+		"action":action
+		};
+		
+		if (window.deviceService) {
+			_currentBridge.applicationServiceDoAction(JSON.stringify(appData),JSON.stringify(parameter),frameName, success);
+		}else{
+			_currentBridge.applicationServiceDoAction(JSON.stringify(appData),JSON.stringify(parameter),frameName, success);
+		}
+	} else if (isIOS) {
+		var param = {};
+		param.request = "applicationServiceDoAction";
+		param.applicationName = params.applicationName;
+		param.serviceName = params.serviceName;
+		param.action = params.action;
+		param.parameter = parameter;
+		_currentBridge.send(param, eval(success));
+	}
+	else
+	{
+		_currentBridge.applicationServiceDoAction(params.applicationName,params.serviceName,params.action,JSON.stringify(params.parameters),eval(success));
+  }	 	
+
+}
+
+
+/**
+ * 新增Socket通讯接口
+ * 1.1* 连接connect
+ * mode: "", //tcp udp
+ *ip: "", //对端ip
+ *port : "", //对端端口
+ *timeout : "", //连接超时时间
+ */
+var _serviceSocketConnect = function(data,_messageCallback,_successCallback,_failCallback) {
+	 //这里传入的params是一个sn的json数组
+	if (isAndroid) {
+		var frameName = null;
+		try {
+			if (getUrlParams(location.href).frameName) {
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			} else {
+				frameName = null;
+			}
+		} catch (e) {
+			frameName = null;
+		}
+		var connectData = {
+			"mode":data['mode'],
+			"ip":data['ip'],
+			"port":data["port"],
+			"type":data["type"],
+			"timeout":data["timeout"]
+		 };
+		_currentBridge.socketConnect(JSON.stringify(connectData), frameName, "_messageCallback", "_successCallback", "_failCallback");
+	} else if (isIOS) {
+		param.request = "serviceSocketConnect";
+		param.ip = data['ip'];
+		param.port = data["port"];
+		param.type = data["type"];
+		param.timeout = data["timeout"];
+		_currentBridge.send(param, _successCallback);
+	}
+
+}
+
+
+
+/**
+ * 1.2* 断开连接
+ * connectId 要断开连接的目标IP地址
+ */
+var _serviceSocketDisconnect = function(connectId,_successCallback) {
+	 //这里传入的params是一个sn的json数组
+	if (isAndroid) {
+		var frameName = null;
+		try {
+			if (getUrlParams(location.href).frameName) {
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			} else {
+				frameName = null;
+			}
+		} catch (e) {
+			frameName = null;
+		}
+		_currentBridge.socketDisconnect(connectId, frameName, "_successCallback");
+	} else if (isIOS) {
+		param.request = "serviceSocketConnect";
+		param.connectId = connectId;
+		_currentBridge.send(param, _successCallback);
+	}
+
+}
+
+
+/**
+ * 1.3*  发送数据
+ * connectId 目标Ip
+ * sendData 发送的数据 
+ */
+var _serviceSocketSend = function(connectId,sendData,_successCallback) {
+	 //这里传入的params是一个sn的json数组
+	if (isAndroid) {
+		var frameName = null;
+		try {
+			if (getUrlParams(location.href).frameName) {
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			} else {
+				frameName = null;
+			}
+		} catch (e) {
+			frameName = null;
+		}
+		_currentBridge.socketSend(connectId, sendData, frameName, "_successCallback");
+	} else if (isIOS) {
+		param.request = "serviceSocketConnect";
+		param.connectId = connectId;
+		param.sendData = sendData;
+		_currentBridge.send(param, _successCallback);
+	}
+
+}
+
+
+
+var _getCurrentMode = function(success, error) {
+	if (isAndroid) {
+		var frameName = null;
+		try {
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			}
 		} catch (e) {
 			frameName = null;
 		}
 		if (frameName != null) {
 			_currentBridge
-					.getCurrentSecurityMode(frameName, "_successCallback");
+					.getCurrentSecurityMode(frameName, success);
 		}
 	}
 }
 
-var _setCurrentMode = function(mode, _successCallback, _failCallback) {
+var _setCurrentMode = function(mode, success, error) {
 	if (isAndroid) {
 		var frameName = null;
 		try {
-			frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			}
 		} catch (e) {
 			frameName = null;
 		}
 		if (frameName != null) {
 			_currentBridge.setCurrentSecurityMode(mode, frameName,
-					"_successCallback");
+					success);
 		}
 	}
 }
 
-var _setModeDetail = function(content, _successCallback, _failCallback) {
+var _setModeDetail = function(content, success, error) {
 	if (isAndroid) {
 		var frameName = null;
 		try {
-			frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			}
 		} catch (e) {
 			frameName = null;
 		}
 		if (frameName != null) {
 			_currentBridge.setSecurityModeDetail(JSON.stringify(content),
-					"_successCallback");
+					success);
 		} else {
 			_currentBridge.setSecurityModeDetail(JSON.stringify(content),
-					"_successCallback");
+					success);
 		}
 	}
 }
 
-var _getModeDetail = function(mode, _successCallback, _failCallback) {
+var _getModeDetail = function(mode, success, error) {
 	if (isAndroid) {
 		var frameName = null;
 		try {
-			frameName = decodeURIComponent(getUrlParams(location.href).frameName);
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName);
+			}
 		} catch (e) {
 			frameName = null;
 		}
 		if (frameName) {
-			_currentBridge.getSecurityModeDetail(mode, "_successCallback");
+			_currentBridge.getSecurityModeDetail(mode, success);
 		} else {
-			_currentBridge.getSecurityModeDetail(mode, "_successCallback");
+			_currentBridge.getSecurityModeDetail(mode, success);
 		}
 	}
 }
 
-var _getDeviceList = function(_successCallback, _failCallback) {
+var _getDeviceList = function(success, error) {
 	if (isAndroid) {
 		var frameName = null;
 		try {
-			frameName = decodeURIComponent(getUrlParams(location.href).frameName);
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName);
+			}
 		} catch (e) {
 			frameName = null;
 		}
 		if (frameName) {
-			_currentBridge.getDeviceList("_successCallback");
+			_currentBridge.getDeviceList(success);
 		} else {
-			_currentBridge.getDeviceList("_successCallback");
+			_currentBridge.getDeviceList(error);
 		}
 	}
 }
 
-// 获取国际化资源。
-var findResource = function(success1, error) {
-	if (isAndroid) {
+
+
+// 启动提速的接口
+var _speedupStart=function(params,success,error){
+
+	if(isAndroid){
+		//android请求。
+		_currentBridge.speedupStart(JSON.stringify(params),"_successCallback","_failCallback");
+	}
+	else if (isIOS) {
+		params.request = "speedupStart";
+		_currentBridge.send(params, _successCallback);
+	}
+}
+// 停止提速的接口
+var _speedupStop=function(params,success,error){
+
+	if(isAndroid){
+		//android请求。
+		_currentBridge.speedupStop(JSON.stringify(params),"_successCallback","_failCallback");
+	}
+	else if (isIOS) {
+		params.request = "speedupStop";
+		_currentBridge.send(params, _successCallback);
+	}
+}
+
+// 查询L2TP VPN通道的接口
+var _wanGetL2tpTunnelStatus=function(params,success,error){
+
+	if(isAndroid){
+		//android请求。
+		_currentBridge.wanGetL2tpTunnelStatus(JSON.stringify(params),"_successCallback","_failCallback");
+	}
+	else if (isIOS) {
+		params.request = "getWanl2tpTunnel";
+		_currentBridge.send(params, _successCallback);
+	}
+}
+		
+// 创建L2TP VPN通道的接口
+var _wanCreateL2tpTunnel = function(params,success,error){
+
+	if(isAndroid){
+		//android请求。
+		_currentBridge.wanCreateL2tpTunnel(JSON.stringify(params),"_successCallback","_failCallback");
+	}
+	else if (isIOS) {
+		params.request = "createWanl2tpTunnel";
+		_currentBridge.send(params, _successCallback);
+	}
+}
+
+// 关联数据流到L2TP VPN 通道上
+var _wanAttachL2tpTunnel=function(params,success,error){
+
+	if(isAndroid){
+		//android请求。
+		_currentBridge.wanAttachL2tpTunnel(JSON.stringify(params),"_successCallback","_failCallback");
+	}
+	else if (isIOS) {
+		params.request = "attachWanl2tpTunnel";
+		_currentBridge.send(params, _successCallback);
+	}
+}
+
+// APP提供删除L2TP VPN通道的接口
+var _wanRemoveL2tpTunnel=function(params,success,error){
+
+	if(isAndroid){
+		//android请求。
+		_currentBridge.wanRemoveL2tpTunnel(JSON.stringify(params),"_successCallback","_failCallback");
+	}
+	else if (isIOS) {
+		params.request = "removeWanl2tpTunnel";
+		_currentBridge.send(params, _successCallback);
+	}
+}
+var _wanDetachL2tpTunnel=function(params,success,error){
+
+	if(isAndroid){
+		//android请求。
+		_currentBridge.wanDetachL2tpTunnel(JSON.stringify(params),"_successCallback","_failCallback");
+	}
+	else if (isIOS) {
+		params.request = "wanDetachL2tpTunnel";
+		_currentBridge.send(params, _successCallback);
+	}
+}
+
+
+
+String.prototype.endWith = function(endStr) {
+	var d = this.length - endStr.length;
+	return (d >= 0 && this.lastIndexOf(endStr) == d)
+}
+
+String.prototype.startWith = function(endStr) {
+	return (this.indexOf(endStr) == 0)
+}
+
+function getUrlParams(url) {
+	var params = {};
+	url.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(str, key, value) {
+		params[key] = value;
+	});
+	return params;
+}
+
+/** 集成在手机app上的第三方插件需要向第三方服务器发送请求消息 */
+var _redirectURL = function(param, _successCallback, _failCallback) {
+	var jsonObj = {};
+	if (param) {
+		if (param.symbolicName) {
+			jsonObj.symbolicName = param.symbolicName;
+		} else {
+			jsonObj.symbolicName = "";
+			return -1;
+		}
+		if (param.data) {
+			jsonObj.data = param.data;
+		}
+		// 暂时没有对入参做校验
+		_currentBridge.redirectAuthURL(JSON.stringify(jsonObj),
+				"_successCallback", "_failCallback");
+	}
+}
+
+var _operate = function(param, _successCallback, _failCallback) {
+	if (param.data) {		
+		if(isAndroid){
+		//android请求。
+		var frameName = null;
+		try {
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName);
+			}
+		} catch (e) {
+			frameName = null;
+		}
+		
+		if(frameName == null){
+			frameName = "";
+		}
+		_currentBridge.operate(JSON.stringify(param.data),frameName, "_successCallback");
+	   }
+	else if (isIOS) {
+		params.request = "speedupoperate";
+		_currentBridge.send(params, _successCallback);
+	   }
+	}
+}
+
+var _queryBandwidths = function(param, _successCallback, _failCallback) {
+	if (param.data) {		
+		if(isAndroid){
+		//android请求。
+		var frameName = null;
+		try {
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName);
+			}
+		} catch (e) {
+			frameName = null;
+		}
+		
+		if(frameName == null){
+			frameName = "";
+		}
+		_currentBridge.queryBandwidths(JSON.stringify(param.data),frameName,
+				"_successCallback");
+	   }
+	else if (isIOS) {
+		params.request = "queryBandwidths";
+		_currentBridge.send(params, _successCallback);
+	   }			
+	}
+}
+
+var _queryService = function(param, _successCallback, _failCallback) {
+	if (param.data) {
+		// 暂时没有对入参做校验			
+		if(isAndroid){
+		//android请求。
+		
+		var frameName = null;
+		try {
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName);
+			}
+		} catch (e) {
+			frameName = null;
+		}
+		
+		if(frameName == null){
+			frameName = "";
+		}
+		
+		_currentBridge.queryService(JSON.stringify(param.data),frameName,
+				"_successCallback");
+	   }
+	else if (isIOS) {
+		params.request = "speedupQueryService";
+		_currentBridge.send(params, _successCallback);
+	   }		
+	}
+}
+
+var _order = function(param, _successCallback, _failCallback) {
+	if (param.data) {	
+		if(isAndroid){
+		//android请求。
+		
+		
+		var frameName = null;
+		try {
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName);
+			}
+		} catch (e) {
+			frameName = null;
+		}
+		
+		if(frameName == null){
+			frameName = "";
+		}
+		_currentBridge.order(JSON.stringify(param.data),frameName, "_successCallback");
+	   }
+	   else if (isIOS) {
+		params.request = "orderSpeedup";
+		_currentBridge.send(params, _successCallback);
+	   }
+	}
+}
+
+var _queryOrderHistory = function(param, _successCallback, _failCallback) {
+	if (param.data) {			
+		if(isAndroid){
+		//android请求。
+		var frameName = null;
+		try {
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName);
+			}
+		} catch (e) {
+			frameName = null;
+		}
+		
+		if(frameName == null){
+			frameName = "";
+		}
+		_currentBridge.queryOrderHistory(JSON.stringify(param.data),frameName,
+				"_successCallback");
+	   }
+	   else if (isIOS) {
+		params.request = "queryOrderHistory";
+		_currentBridge.send(params, _successCallback);
+	   }		
+	}
+}
+
+
+var _queryUseRecord = function(param, _successCallback, _failCallback) {
+	if (param.data) {			
+		if(isAndroid){
+		//android请求。
+		var frameName = null;
+		try {
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName);
+			}
+		} catch (e) {
+			frameName = null;
+		}
+		
+		if(frameName == null){
+			frameName = "";
+		}
+		_currentBridge.queryUseRecord(JSON.stringify(param.data),frameName,
+				"_successCallback");
+	   }
+	   else if (isIOS) {
+		params.request = "queryUseRecord";
+		_currentBridge.send(params, _successCallback);
+	   }		
+	}
+}
+
+var _scan = function(_successCallback, _failCallback) {
+		if(isAndroid){
+		//android请求。
+		_currentBridge.scan("_successCallback","_failCallback");
+	   }
+}
+
+var _wifiSwitch = function(ssid,password,success,error){
+	if(isAndroid){
+		var jsonObj = {}; 
+		jsonObj.ssid = ssid;
+		if (password)
+		{
+			jsonObj.password = password;
+	    }					
+		else
+		{
+			jsonObj.password = "";
+		}
+		
+		var frameName = null;
+		try {
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName);
+			}
+		} catch (e) {
+			frameName = null;
+		}
+		
+		if(frameName == null){
+			frameName = "";
+		}
+		
+		_currentBridge.switchWifi(JSON.stringify(jsonObj),frameName,success);
+	}
+	
+}
+
+var _getControllerWifi = function(success,error){
+	if(isAndroid){
+		_currentBridge.currentWifiInfo(success);
+	}
+}
+
+var _getWifiList = function(success,error){
+	if(isAndroid){
+		_currentBridge.getWifiList(success);
+	}
+}
+
+var _getResource = function(url,success){
+	if(isAndroid){
+		var frameName = null;
+		try {
+			if(getUrlParams(location.href).frameName){
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			}else{
+				frameName = null;
+			} 
+				
+		} catch (e) {
+			frameName = null;
+		}
 		// android请求。
-		var language = "zh";
-		try {
-			language = _currentBridge.getLanguage();
-		} catch (e) {
-			language = _currentBridge.getCurrentLanguage();
+		if (frameName != null) {
+			_currentBridge.getResource(url,frameName,success);
+		} else {
+			_currentBridge.getResource(url,"",success);
 		}
-		_language = language;
-		// alert(language);
-		success1(_initWithLanguage(language));
-		console.log(language);
-
-	} else if (isIOS) {
-		// IOS请求。
+	}
+	else if(isIOS){
 		var param = {};
-		param.request = "userLanguage";
-		tempCallback = success1;
-
-		setTimeout(function() {
-			_currentBridge.send(param, iosLanguageCallback);
-		}, 100);
-	} else {
-		var language = _currentBridge.getLanguageType();
-		_language = language;
-		success1(_initWithLanguage(language));
-	}
-}
-
-var _getCurrentUserInfo = function(success, error) {
-	if (isAndroid) {
-		// android请求。
-		var userInfo = _currentBridge.getCurrentUserInfo();
+		param.request = "getResource";
+		param.url = url;
 		
-		success(JSON.parse(userInfo));
-		console.log(userInfo);
-
-	} else if (isIOS) {
-		// IOS请求。
-		var param={};
-        param.request="getCurrentUserInfo";
-        _currentBridge.send(param,success);
-	} else {
+		initBridge(function(){
+			_currentBridge.send(param,eval(success));
+		})
 		
 	}
-}
-
-var _sendMsgToOnt = function(params, _successCallback) {
-	if (isAndroid) {
-		// android请求。
-		_currentBridge.sendMsgToOnt(params, "_successCallback");
+	else
+	{
+		_currentBridge.getResource(url,eval(success));
 	}
 }
+
+var _showTitleBar = function(){
+	if(isAndroid){
+		_currentBridge.showTitleBar();
+	}
+	else if(isIOS)
+	{
+		var param = {};
+		param.request = "showTitleBar";
+		initBridge(function(){
+			_currentBridge.send(param);
+		})
+	}
+	else
+	{
+		if(getUrlParams(window.location.href).frameId){
+				var frameId = getUrlParams(window.location.href).frameId;
+				_currentBridge.showTitleBar(frameId);
+			}
+	}
+}
+
+var _hideTitleBar = function(){
+	if(isAndroid){
+		_currentBridge.hideTitleBar();
+	}
+	else if(isIOS)
+	{
+		var param = {};
+		
+		param.request = "hideTitleBar";
+		
+        initBridge(function(){
+                   _currentBridge.send(param);
+        })
+	}
+	else
+	{
+		if(getUrlParams(window.location.href).frameId){
+				var frameId = getUrlParams(window.location.href).frameId;
+				_currentBridge.hideTitleBar(frameId);
+			}
+	}
+}
+
+var _setTitleBar = function(title){
+	if(isAndroid){
+		_currentBridge.setTitleBar(title,"");
+	}
+	else if(isIOS)
+	{
+		var param = {};
+		
+		param.request = "setTitleBar";
+		param.title = title;
+		
+		_currentBridge.send(param);
+	}
+	else
+	{
+		if(getUrlParams(window.location.href).frameId){
+				var frameId = getUrlParams(window.location.href).frameId;
+				_currentBridge.setTitleBar(title,frameId);
+			}
+	}
+}
+
+var _addWidgetMoreAction = function(fun){
+	if(isAndroid){
+		if(getUrlParams(window.location.href).frameId){
+			var frameId = getUrlParams(window.location.href).frameId;
+			parent.setEventOnElement(frameId,fun);
+		}
+	}
+	else if(isIOS)
+	{
+		if(getUrlParams(window.location.href).frameId){
+			var frameId = getUrlParams(window.location.href).frameId;
+			parent.setEventOnElement(frameId,fun);
+		}
+	}
+	else
+	{
+		if(getUrlParams(window.location.href).frameId){
+			var frameId = getUrlParams(window.location.href).frameId;
+			_currentBridge.addWidgetMoreAction(frameId,fun);
+		}
+	}
+}
+
+var _showCurrentWidget = function(){
+	if(isAndroid)
+	{
+		try{
+			var frameId = getUrlParams(window.location.href).frameId;
+			var iframe = parent.document.getElementById(frameId);
+			var widgetDiv = parent.document.getElementById("div_"+frameId);
+			widgetDiv.style.display = "block";
+			iframe.parentNode.style.display = "block";
+			//重绘高度。
+			iframe.height = iframe.contentWindow.document.documentElement.scrollHeight;
+			//显示卡片
+		}catch(e){
+		
+		}
+	}
+	else if(isIOS)
+	{
+		try{
+			var frameId = getUrlParams(window.location.href).frameId;
+			var iframe = parent.document.getElementById(frameId);
+			var widgetDiv = parent.document.getElementById("div_"+frameId);
+			widgetDiv.style.display = "block";
+			iframe.parentNode.style.display = "block";
+			//重绘高度。
+			iframe.height = iframe.contentWindow.document.documentElement.scrollHeight;
+		//显示卡片
+		}catch(e){
+		
+		}
+	}
+	else
+	{
+		if(getUrlParams(window.location.href).frameId){
+			var frameId = getUrlParams(window.location.href).frameId;
+			_currentBridge.showCurrentWidget(frameId);
+		}
+	}
+}
+var _hideCurrentWidget = function(){
+	if(isAndroid)
+	{
+		try{
+			var frameId = getUrlParams(window.location.href).frameId;
+			var widgetDiv = parent.document.getElementById("div_"+frameId);
+			widgetDiv.style.display = "none";
+		}catch(e){
+		
+		}
+	}
+	else if(isIOS)
+	{
+		try{
+			var frameId = getUrlParams(window.location.href).frameId;
+			var widgetDiv = parent.document.getElementById("div_"+frameId);
+			widgetDiv.style.display = "none";
+		}catch(e){
+		
+		}
+	}
+	else
+	{
+		if(getUrlParams(window.location.href).frameId){
+			var frameId = getUrlParams(window.location.href).frameId;
+			_currentBridge.hideCurrentWidget(frameId);
+		}
+	}
+}
+
 
 var _getFamilyId = function(_successCallback) {
 	if (isAndroid) {
@@ -1200,14 +2498,6 @@ var _chooseFiles = function(maxFile, type, source, _successCallback) {
 		// android请求。
 		_currentBridge.chooseFiles(maxFile, type, source, "_successCallback");
 	}
-	else if(isIOS)
-    {
-        var param={};
-        param.request="chooseFiles";
-        param.type=type;
-        param.source=source;
-        _currentBridge.send(param,_successCallback);
-    }
 }
 
 var _putObject = function(type, url, files, _processCallback, _successCallback) {
@@ -1216,27 +2506,8 @@ var _putObject = function(type, url, files, _processCallback, _successCallback) 
 		_currentBridge.putObject(type, url, files, "_processCallback",
 				"_successCallback");
 	}
-	else if(isIOS)
-    {
-        var param={};
-        param.request="putObject";
-        param.type=type;
-        param.url=url;
-        param.files=files;
-        _currentBridge.send(param,_processCallback);
-        
-        
-        var param2={};
-        param2.request="putObjectRes";
-        param2.type=type;
-        param2.url=url;
-        param2.files=files;
-        _currentBridge.send(param2,_successCallback);
-        
-    
-    }
-	
 }
+
 
 var _createDirectory = function(type, url, name, _successCallback) {
 	if (isAndroid) {
@@ -1272,331 +2543,247 @@ var _moveObject = function(type, srcPath, destPath, _successCallback) {
 		_currentBridge.moveObject(type, srcPath, destPath, "_successCallback");
 		}
 		}
-// 启动提速的接口
-var _speedupStart=function(params,success,error){
 
-	if(isAndroid){
-		//android请求。
-		_currentBridge.speedupStart(JSON.stringify(params),"_successCallback","_failCallback");
-	}
-	else if (isIOS) {
-		params.request = "speedupStart";
-		_currentBridge.send(params, _successCallback);
-	}
-}
-// 停止提速的接口
-var _speedupStop=function(params,success,error){
 
-	if(isAndroid){
-		//android请求。
-		_currentBridge.speedupStop(JSON.stringify(params),"_successCallback","_failCallback");
-	}
-	else if (isIOS) {
-		params.request = "speedupStop";
-		_currentBridge.send(params, _successCallback);
-	}
-}
-
-// 查询L2TP VPN通道的接口
-var _getWanl2tpTunnel=function(params,success,error){
-
-	if(isAndroid){
-		//android请求。
-		_currentBridge.getWanl2tpTunnel(JSON.stringify(params),"_successCallback","_failCallback");
-	}
-	else if (isIOS) {
-		params.request = "getWanl2tpTunnel";
-		_currentBridge.send(params, _successCallback);
-	}
-}
+var _getCurrentUserInfo = function(success, error) {
+	if (isAndroid) {
+		// android请求。
+		var userInfo = _currentBridge.getCurrentUserInfo();
 		
-// 创建L2TP VPN通道的接口
-var _createWanl2tpTunnel = function(params,success,error){
+		success(JSON.parse(userInfo));
+		console.log(userInfo);
 
-	if(isAndroid){
-		//android请求。
-		_currentBridge.createWanl2tpTunnel(JSON.stringify(params),"_successCallback","_failCallback");
-	}
-	else if (isIOS) {
-		params.request = "createWanl2tpTunnel";
-		_currentBridge.send(params, _successCallback);
-	}
-}
-
-// 关联数据流到L2TP VPN 通道上
-var _attachWanl2tpTunnel=function(params,success,error){
-
-	if(isAndroid){
-		//android请求。
-		_currentBridge.attachWanl2tpTunnel(JSON.stringify(params),"_successCallback","_failCallback");
-	}
-	else if (isIOS) {
-		params.request = "attachWanl2tpTunnel";
-		_currentBridge.send(params, _successCallback);
+	} else if (isIOS) {
+		// IOS请求。
+        var param = {};
+        
+        param.request = "getCurrentUserInfo";
+        _currentBridge.send(param,eval(success));
+		
+	} else {
+		_currentBridge.getCurrentUserInfo(success);
 	}
 }
 
-// APP提供删除L2TP VPN通道的接口
-var _removeWanl2tpTunnel=function(params,success,error){
 
-	if(isAndroid){
-		//android请求。
-		_currentBridge.removeWanl2tpTunnel(JSON.stringify(params),"_successCallback","_failCallback");
-	}
-	else if (isIOS) {
-		params.request = "removeWanl2tpTunnel";
-		_currentBridge.send(params, _successCallback);
+
+var _connect = function(data, success, error) {
+	if (isAndroid) {
+		// android请求。
+		_currentBridge.putObject(JSON.stringify(data), "_successCallback");
 	}
 }
 
-function iosLanguageCallback(languageType) {
-	_language = languageType;
-	tempCallback(_initWithLanguage(languageType));
-}
 
-function getResourceAjax(jsonPath) {
-	// alert(jsonPath);
-	var xmlhttp;
-	if (window.XMLHttpRequest) {
-		xmlhttp = new XMLHttpRequest();
-	} else {// code for IE6, IE5
-		xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-	}
-	xmlhttp.open("GET", jsonPath, false);
-	xmlhttp.send();
-	// alert(xmlhttp.responseText);
-	var json = eval('(' + xmlhttp.responseText + ')');
-	return json
-}
 
-String.prototype.endWith = function(endStr) {
-	var d = this.length - endStr.length;
-	return (d >= 0 && this.lastIndexOf(endStr) == d)
-}
-
-String.prototype.startWith = function(endStr) {
-	return (this.indexOf(endStr) == 0)
-}
-
-function _initWithLanguage(language) {
-	
-	var resource = null;
-	try {
-		if (language.toLowerCase().endWith("zh")) {
-			try{
-				resource = getResourceAjax("../resource/resource_zh.json");
-			}catch(e){
-				resource = getResourceAjax("resource/resource_zh.json");
-			}
-		} else if (language.toLowerCase().endWith("en")) {
-			try{
-				resource = getResourceAjax("../resource/resource_en.json");
-			}catch(e){
-				resource = getResourceAjax("resource/resource_en.json");
-			}
-			
-		} else if (language.toLowerCase().endWith("ru")) {
-			try{
-				resource = getResourceAjax("../resource/resource_ru.json");
-			}catch(e){
-				resource = getResourceAjax("resource/resource_ru.json");
-			}
-		} else if (language.toLowerCase().endWith("ar")) {
-			try{
-				resource = getResourceAjax("../resource/resource_ar.json");
-			}catch(e){
-				resource = getResourceAjax("resource/resource_ar.json");
-			}
-		} else if (language.toLowerCase().endWith("es")) {
-			try{
-				resource = getResourceAjax("../resource/resource_es.json");
-			}catch(e){
-				resource = getResourceAjax("resource/resource_es.json");
-			}
-		} else if (language.toLowerCase().endWith("de")) {
-			try{
-				resource = getResourceAjax("../resource/resource_de.json");
-			}catch(e){
-				resource = getResourceAjax("resource/resource_de.json");
-			}
-		} else {
-			try{
-				resource = getResourceAjax("../resource/resource.json");
-			}catch(e){
-				resource = getResourceAjax("../resource/resource.json");
-			}
-		}
-	} catch (e) {
-		resource = getResourceAjax("resource/resource.json");
-	}
-	return resource
-
-}
-
-function getUrlParams(url) {
-	var params = {};
-	url.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(str, key, value) {
-		params[key] = value;
-	});
-	return params;
-}
-
-/** 集成在手机app上的第三方插件需要向第三方服务器发送请求消息 */
-var _redirectURL = function(param, _successCallback, _failCallback) {
-	var jsonObj = {};
-	if (param) {
-		if (param.symbolicName) {
-			jsonObj.symbolicName = param.symbolicName;
-		} else {
-			jsonObj.symbolicName = "";
-			return -1;
-		}
-		if (param.data) {
-			jsonObj.data = param.data;
-		}
-		// 暂时没有对入参做校验
-		_currentBridge.redirectAuthURL(JSON.stringify(jsonObj),
-				"_successCallback", "_failCallback");
+var _disconnect = function(connectId, success, error) {
+	if (isAndroid) {
+		// android请求。
+		_currentBridge.putObject(connectId, "_successCallback","_failCallback");
 	}
 }
 
-var _operate = function(param, _successCallback, _failCallback) {
-	if (param.data) {		
-		if(isAndroid){
-		//android请求。
-		_currentBridge.operate(JSON.stringify(param.data), "_successCallback");
-	   }
-	else if (isIOS) {
-		params.request = "speedupoperate";
-		_currentBridge.send(params, _successCallback);
-	   }
+
+
+var _send = function(connectId, data, success, error) {
+	if (isAndroid) {
+		// android请求。
+		_currentBridge.putObject(connectId, data, "_successCallback", "_failCallback");
 	}
 }
 
-var _queryBandwidths = function(param, _successCallback, _failCallback) {
-	if (param.data) {		
-		if(isAndroid){
-		//android请求。
-		_currentBridge.queryBandwidths(JSON.stringify(param.data),
-				"_successCallback");
-	   }
-	else if (isIOS) {
-		params.request = "queryBandwidths";
-		_currentBridge.send(params, _successCallback);
-	   }			
-	}
-}
 
-var _queryService = function(param, _successCallback, _failCallback) {
-	if (param.data) {
-		// 暂时没有对入参做校验			
-		if(isAndroid){
-		//android请求。
-		_currentBridge.queryService(JSON.stringify(param.data),
-				"_successCallback");
-	   }
-	else if (isIOS) {
-		params.request = "speedupQueryService";
-		_currentBridge.send(params, _successCallback);
-	   }		
-	}
-}
-
-var _order = function(param, _successCallback, _failCallback) {
-	if (param.data) {	
-		if(isAndroid){
-		//android请求。
-		_currentBridge.order(JSON.stringify(param.data), "_successCallback");
-	   }
-	   else if (isIOS) {
-		params.request = "orderSpeedup";
-		_currentBridge.send(params, _successCallback);
-	   }
-	}
-}
-
-var _queryOrderHistory = function(param, _successCallback, _failCallback) {
-	if (param.data) {			
-		if(isAndroid){
-		//android请求。
-		_currentBridge.queryOrderHistory(JSON.stringify(param.data),
-				"_successCallback");
-	   }
-	   else if (isIOS) {
-		params.request = "queryOrderHistory";
-		_currentBridge.send(params, _successCallback);
-	   }		
-	}
-}
-
-var _queryUseRecord = function(param, _successCallback, _failCallback) {
-	if (param.data) {
-		// 暂时没有对入参做校验
-		if(isAndroid){
-		//android请求。
-		_currentBridge.queryUseRecord(JSON.stringify(param.data),
-				"_successCallback");
-	   }
-	   else if (isIOS) {
-		params.request = "queryUseRecord";
-		_currentBridge.send(params, _successCallback);
-	   }		
-	}
-}
-/**
- * 插件数据查询
- */
-var _getPluginData = function(param, _successCallback, _failCallback) {
-	if (param) {
-		// 暂时没有对入参做校验
-		if(isAndroid){
-		//android请求。
-		var jsonParams = {};
-		if(param.symbolicName)
-		{
-			jsonParams.symbolicName = param.symbolicName;
-		}
-		if(param.type)
-		{
-			jsonParams.type = param.type;
-		}
-		if(param.key)
-		{
-			jsonParams.key = param.key;
-		}	
-			
-		_currentBridge.getPluginData(JSON.stringify(jsonParams),
-				"_successCallback","_failCallback");
-	   }
-	}
-}
 /**
  * 插件数据备份 
  */
-var _updatePluginData = function(param, _successCallback, _failCallback) {
-	if (param) {
+var _putData = function(key, data, _successCallback, _failCallback) {
 		// 暂时没有对入参做校验
 		if(isAndroid){
 		//android请求。
 		var jsonParams = {};
-		if(param.symbolicName)
+		
+		if(key)
 		{
-			jsonParams.symbolicName = param.symbolicName;
+			jsonParams.key = key;
 		}
-		if(param.type)
+		if(data)
 		{
-			jsonParams.type = param.type;
-		}
-		if(param.key)
-		{
-			jsonParams.key = param.key;
-		}
-		if(param.data)
-		{
-			jsonParams.data = param.data;
+			jsonParams.data = data;
 		}	
-		_currentBridge.updatePluginData(JSON.stringify(jsonParams),
+		_currentBridge.putData(JSON.stringify(jsonParams),window.location.href,
 				"_successCallback","_failCallback");
 	   }
+}
+
+
+/**
+ * 插件数据删除
+ */
+var _removeData = function(key, _successCallback, _failCallback) {
+	// 暂时没有对入参做校验
+		if(isAndroid){
+		//android请求。
+		_currentBridge.removeData(key,window.location.href,
+				"_successCallback","_failCallback");
+	   }
+}
+
+/**
+ * 插件数据清空
+ */
+var _clearData = function(_successCallback, _failCallback) {
+		// 暂时没有对入参做校验
+		if(isAndroid){
+		//android请求。
+		_currentBridge.clearData(window.location.href,"_successCallback","_failCallback");
+	   }
+}
+
+/**
+ * 插件数据查询
+ */
+var _listData = function(_successCallback, _failCallback) {
+		// 暂时没有对入参做校验
+		if(isAndroid){
+		//android请求。
+		_currentBridge.listData(window.location.href,"_successCallback","_failCallback");
+	   }
+}
+
+
+
+var _getGateWayIp = function(_successCallback, _failCallback) {
+		// 暂时没有对入参做校验
+		if(isAndroid){
+		//android请求。
+		_currentBridge.getGateWayIp("_successCallback","_failCallback");
+	   }
+    else if (isIOS)
+    {
+        //IOS请求.
+        var param = {};
+        param.request = "getGateWayIp";
+        _currentBridge.send(param, _successCallback);
+    }
+}
+
+
+/**
+ * 获取云存储容量大小
+ */
+var _getCloudStorageData = function(_successCallback, _failCallback) {
+	if (isAndroid) {
+		var frameName = null;
+		try {
+			if (getUrlParams(location.href).frameName) {
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			} else {
+				frameName = null;
+			}
+		} catch (e) {
+			frameName = null;
+		}
+		_currentBridge.getCloudStorageData(frameName, "_successCallback");
+	} else if (isIOS) {
+		var param = {};
+		param.request = "getCloudStorageData";
+		_currentBridge.send(param, _successCallback);
 	}
 }
+
+/**
+ * 获取外置容量大小
+ */
+var _getExternalStorageData = function(_successCallback, _failCallback) {
+	if (isAndroid) {
+		var frameName = null;
+		try {
+			if (getUrlParams(location.href).frameName) {
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			} else {
+				frameName = null;
+			}
+		} catch (e) {
+			frameName = null;
+		}
+		_currentBridge.getExternalStorageStorageData(frameName,
+				"_successCallback");
+	} else if (isIOS) {
+		var param = {};
+		param.request = "getExternalStorageStorageData";
+		//	      alert(_currentBridge);
+		_currentBridge.send(param, _successCallback);
+	}
+
+}
+
+/**
+ * 打开视频
+ */
+var _openStorageVideoPlayer = function(type,url,success,error) {
+	if (isAndroid) {
+		var frameName = null;
+		try {
+			if (getUrlParams(location.href).frameName) {
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			} else {
+				frameName = null;
+			}
+		} catch (e) {
+			frameName = null;
+		}
+		
+		if(frameName == null){
+			_currentBridge.openStorageVideoPlayer(type,url,"",success);
+		}else{
+			_currentBridge.openStorageVideoPlayer(type,url,frameName,success);
+		}
+	} else if (isIOS) {
+		
+		var param = {};
+		
+		param.request = "openStorageVideoPlayer";
+		param.type = type;
+		param.url = url;
+		
+		_currentBridge.send(param,eval(success));
+		
+	}
+}
+
+/**
+ * 浏览图片。
+ */
+var _openStorageImageViewer = function(type,url,success,error) {
+	if (isAndroid) {
+		var frameName = null;
+		try {
+			if (getUrlParams(location.href).frameName) {
+				frameName = decodeURIComponent(getUrlParams(location.href).frameName)
+			} else {
+				frameName = null;
+			}
+		} catch (e) {
+			frameName = null;
+		}
+		
+		if(frameName == null){
+			_currentBridge.openStorageImageViewer(type,url,"",success);
+		}else{
+			_currentBridge.openStorageImageViewer(type,url,frameName,success);
+		}
+	} else if (isIOS) {
+		
+		var param = {};
+		
+		param.request = "openStorageImageViewer";
+		param.type = type;
+		param.url = url;
+		
+		_currentBridge.send(param,eval(success));
+		
+	}
+	
+}
+
+
